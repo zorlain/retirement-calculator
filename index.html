@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<script>
+  (function () {
+    var saved = localStorage.getItem("theme");
+    if (saved === "light" || saved === "dark") {
+      document.documentElement.setAttribute("data-theme", saved);
+    }
+  })();
+</script>
+<title>무료 은퇴자산계산기 - 은퇴자산 시뮬레이션, 경제적 자유(FIRE) 계산기</title>
+<meta name="description" content="현재 자산과 저축액, 예상 수익률을 입력해 은퇴 시점 자산을 시뮬레이션하고, 안전인출률(SWR) 기준으로 경제적 자유에 필요한 자산과 예상 도달 시점을 무료로 계산해보세요." />
+<meta name="keywords" content="은퇴자산계산기,경제적자유계산기,파이어계산기,FIRE계산기,은퇴계산기,조기은퇴계산기,안전인출률" />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://zorlain.github.io/retirement-calculator/" />
+<meta name="google-site-verification" content="mv-oXvo6ZrAOkqeYce0jNg3vF7Jf_Q9YJhgHb22YaSU" />
+
+<meta property="og:type" content="website" />
+<meta property="og:title" content="무료 은퇴자산계산기 - 은퇴자산 시뮬레이션, 경제적 자유(FIRE) 계산기" />
+<meta property="og:description" content="현재 자산과 저축액, 예상 수익률로 은퇴 시점 자산을 시뮬레이션하고, 안전인출률(SWR) 기준으로 경제적 자유 자산과 예상 도달 시점을 무료로 계산해보세요." />
+<meta property="og:url" content="https://zorlain.github.io/retirement-calculator/" />
+<meta property="og:locale" content="ko_KR" />
+
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="무료 은퇴자산계산기" />
+<meta name="twitter:description" content="은퇴자산 시뮬레이션과 경제적 자유 자산을 무료로 바로 계산합니다." />
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8F%A6%3C/text%3E%3C/svg%3E" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<link rel="stylesheet" href="css/style.css?v=2" />
+</head>
+<body>
+<div class="page">
+
+  <header class="hero">
+    <h1>🏦 은퇴자산계산기</h1>
+    <p>은퇴 자산을 시뮬레이션하고, 경제적 자유에 필요한 자산과 예상 도달 시점을 계산합니다.</p>
+    <div class="hero-actions">
+      <button type="button" class="theme-toggle" id="theme-toggle" aria-label="다크/라이트 모드 전환">🌙</button>
+      <div class="menu" id="menu">
+        <button type="button" class="menu-toggle" id="menu-toggle" aria-label="메뉴 열기">☰</button>
+        <div class="menu-dropdown" id="menu-dropdown">
+          <div class="tool-list-group-label">다른 도구</div>
+          <a class="tool-list-item" href="https://zorlain.github.io/lotto-generator/">🎱 로또 번호 생성기</a>
+          <a class="tool-list-item" href="https://zorlain.github.io/pension-lotto-generator/">🎰 연금복권 번호 생성기</a>
+          <a class="tool-list-item" href="https://zorlain.github.io/loan-calculator/">💰 대출·예금 계산기</a>
+          <a class="tool-list-item" href="https://zorlain.github.io/salary-calculator/">💵 연봉·퇴직금 계산기</a>
+          <a class="tool-list-item" href="https://zorlain.github.io/health-calculator/">🩺 BMI·대사량 계산기</a>
+          <a class="tool-list-item" href="https://zorlain.github.io/date-calculator/">📆 디데이·나이 계산기</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <nav class="tabs" id="tabs">
+    <button class="tab-btn active" data-tab="sim">🌱 자산 시뮬레이션</button>
+    <button class="tab-btn" data-tab="paradise">🏝️ 낙원 금액</button>
+  </nav>
+
+  <!-- 탭 1: 은퇴자산 시뮬레이션 -->
+  <section class="tab-panel" data-tab-panel="sim">
+    <div class="card">
+      <h2>
+        🌱 은퇴자산 시뮬레이션
+        <button type="button" class="info-btn" aria-label="자세히 보기">
+          <span aria-hidden="true">ⓘ</span>
+          <span class="info-tooltip">
+            현재 자산에서 시작해 매달 저축액을 더하고, 입력한 연 수익률로 매달 복리 성장한다고 가정해
+            지정한 기간 뒤의 예상 자산을 계산합니다.
+          </span>
+        </button>
+      </h2>
+      <p class="card-desc-short">현재 자산과 월 저축액을 입력하면 목표 기간 뒤의 예상 자산을 계산해드려요.</p>
+
+      <div class="field-group">
+        <label for="s-asset">현재 자산</label>
+        <div class="field-input-wrap">
+          <input type="text" inputmode="numeric" id="s-asset" placeholder="예: 5,000" />
+          <span class="field-suffix">만원</span>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label for="s-saving">월 저축액</label>
+          <div class="field-input-wrap">
+            <input type="text" inputmode="numeric" id="s-saving" placeholder="예: 100" />
+            <span class="field-suffix">만원</span>
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="s-rate">예상 연 수익률</label>
+          <div class="field-input-wrap">
+            <input type="text" inputmode="decimal" id="s-rate" placeholder="예: 7" />
+            <span class="field-suffix">%</span>
+          </div>
+        </div>
+      </div>
+      <div class="field-group">
+        <label for="s-years">시뮬레이션 기간</label>
+        <div class="field-input-wrap">
+          <input type="text" inputmode="numeric" id="s-years" placeholder="예: 20" />
+          <span class="field-suffix">년</span>
+        </div>
+      </div>
+
+      <button class="calc-btn" id="sim-calc-btn">🔄 계산하기</button>
+
+      <div id="sim-result"></div>
+    </div>
+  </section>
+
+  <!-- 탭 2: 낙원 금액 -->
+  <section class="tab-panel" data-tab-panel="paradise" hidden>
+    <div class="card">
+      <h2>
+        🏝️ 낙원 금액 계산 (경제적 자유)
+        <button type="button" class="info-btn" aria-label="자세히 보기">
+          <span aria-hidden="true">ⓘ</span>
+          <span class="info-tooltip">
+            <b>안전인출률(SWR)</b>: 매년 자산의 이 비율만큼만 인출해서 쓰면 원금이 잘 줄어들지 않는다고
+            가정하는 비율입니다. 흔히 4% 룰(연 생활비의 25배 자산)이 널리 쓰이며, 보수적으로 3~3.5%를
+            쓰기도 합니다.
+          </span>
+        </button>
+      </h2>
+      <p class="card-desc-short">원하는 월 생활비를 입력하면, 그 생활비를 평생 유지하기 위한 낙원 금액을 계산합니다.</p>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label for="p-spend">원하는 월 생활비</label>
+          <div class="field-input-wrap">
+            <input type="text" inputmode="numeric" id="p-spend" placeholder="예: 300" />
+            <span class="field-suffix">만원</span>
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="p-swr">안전 인출률 (SWR)</label>
+          <div class="field-input-wrap">
+            <input type="text" inputmode="decimal" id="p-swr" placeholder="예: 4" value="4" />
+            <span class="field-suffix">%</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="calc-btn" id="paradise-calc-btn">🔄 낙원 금액 계산하기</button>
+
+      <div id="paradise-result"></div>
+    </div>
+  </section>
+
+  <footer>
+    이 계산기는 매달 복리 성장과 일정한 안전인출률(SWR)을 가정한 참고용 시뮬레이션이며, 실제 투자수익률·물가상승률·세금 등에
+    따라 결과가 크게 달라질 수 있습니다. 중요한 은퇴·투자 계획은 반드시 전문가와 상담하세요.
+  </footer>
+
+</div>
+
+<script src="js/app.js?v=2"></script>
+</body>
+</html>
