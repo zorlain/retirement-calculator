@@ -84,6 +84,99 @@ body {
   outline-offset: 2px;
 }
 
+/* 사이드바 레이아웃 — 항상 보이는 좌측 사이드바(데스크톱) + 드로어(모바일) */
+.layout {
+  display: flex;
+  align-items: flex-start;
+}
+
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  background: var(--card);
+  padding: 32px 16px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.sidebar-group {
+  margin-bottom: 24px;
+}
+
+.sidebar-group:last-child {
+  margin-bottom: 0;
+}
+
+.sidebar-group-label {
+  padding: 0 10px 8px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 10px;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sidebar-link:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.sidebar-link.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.sidebar-backdrop {
+  display: none;
+}
+
+.sidebar-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 9999px;
+  border: 1px solid var(--text);
+  background: transparent;
+  color: var(--text);
+  font-size: 18px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.sidebar-toggle:hover {
+  background: var(--hover-tint);
+}
+
+.sidebar-toggle:active {
+  transform: scale(0.94);
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+}
+
 .page {
   max-width: 840px;
   margin: 0 auto;
@@ -120,86 +213,6 @@ header.hero p {
   position: relative;
 }
 
-/* 헤더 햄버거 메뉴 — 누르면 다른 도구 목록이 드롭다운으로 표시 */
-.menu {
-  position: relative;
-}
-
-.menu-toggle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-  border-radius: 9999px;
-  border: 1px solid var(--text);
-  background: transparent;
-  color: var(--text);
-  font-size: 18px;
-  cursor: pointer;
-  transition: background 0.15s, transform 0.1s;
-}
-
-.menu-toggle:hover {
-  background: var(--hover-tint);
-}
-
-.menu-toggle:active {
-  transform: scale(0.94);
-}
-
-.menu-dropdown {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 8px);
-  min-width: 240px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  background: var(--card-elevated);
-  border-radius: 16px;
-  padding: 8px;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-4px);
-  transition: opacity 0.15s, transform 0.15s, visibility 0.15s;
-  z-index: 40;
-}
-
-.menu.open .menu-dropdown {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-.tool-list-group-label {
-  padding: 6px 10px 8px;
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-
-.tool-list-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 10px;
-  border-radius: 10px;
-  background: transparent;
-  color: var(--text);
-  font-size: 14px;
-  font-weight: 500;
-  text-decoration: none;
-  transition: background 0.15s;
-}
-
-.tool-list-item:hover {
-  background: var(--accent-soft);
-  color: var(--accent);
-}
 
 /* 탭 내비게이션 */
 .tabs {
@@ -601,6 +614,34 @@ footer {
 
 /* 모바일 (약 360~430px 기준) */
 @media (max-width: 640px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 0.2s;
+    z-index: 50;
+    box-shadow: 8px 0 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-backdrop.open {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 45;
+  }
+
+  .sidebar-toggle {
+    display: inline-flex;
+  }
+
   .page {
     padding: 28px 16px 72px;
   }

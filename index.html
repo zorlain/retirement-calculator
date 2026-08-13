@@ -34,24 +34,32 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
-<link rel="stylesheet" href="css/style.css?v=2" />
+<link rel="stylesheet" href="css/style.css?v=3" />
 </head>
 <body>
-<div class="page">
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">🎰 복권</div>
+      <a class="sidebar-link" href="https://zorlain.github.io/lotto-generator/">🎱 로또 번호 생성기</a>
+      <a class="sidebar-link" href="https://zorlain.github.io/pension-lotto-generator/">🎰 연금복권 번호 생성기</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-label">💰 재테크</div>
+      <a class="sidebar-link active" href="https://zorlain.github.io/retirement-calculator/">🏦 은퇴자산계산기</a>
+    </div>
+  </aside>
+  <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+  <div class="main-content">
+  <div class="page">
 
   <header class="hero">
     <h1>🏦 은퇴자산계산기</h1>
     <p>은퇴 자산을 시뮬레이션하고, 경제적 자유에 필요한 자산과 예상 도달 시점을 계산합니다.</p>
     <div class="hero-actions">
+      <button type="button" class="sidebar-toggle" id="sidebar-toggle" aria-label="메뉴 열기">☰</button>
       <button type="button" class="theme-toggle" id="theme-toggle" aria-label="다크/라이트 모드 전환">🌙</button>
-      <div class="menu" id="menu">
-        <button type="button" class="menu-toggle" id="menu-toggle" aria-label="메뉴 열기">☰</button>
-        <div class="menu-dropdown" id="menu-dropdown">
-          <div class="tool-list-group-label">다른 도구</div>
-          <a class="tool-list-item" href="https://zorlain.github.io/lotto-generator/">🎱 로또 번호 생성기</a>
-          <a class="tool-list-item" href="https://zorlain.github.io/pension-lotto-generator/">🎰 연금복권 번호 생성기</a>
-        </div>
-      </div>
     </div>
   </header>
 
@@ -156,8 +164,10 @@
     따라 결과가 크게 달라질 수 있습니다. 중요한 은퇴·투자 계획은 반드시 전문가와 상담하세요.
   </footer>
 
+  </div>
+  </div>
 </div>
 
-<script src="js/app.js?v=2"></script>
+<script src="js/app.js?v=3"></script>
 </body>
 </html>
