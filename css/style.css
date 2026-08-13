@@ -84,23 +84,25 @@ body {
   outline-offset: 2px;
 }
 
-/* 사이드바 레이아웃 — 항상 보이는 좌측 사이드바(데스크톱) + 드로어(모바일) */
-.layout {
-  display: flex;
-  align-items: flex-start;
-}
-
+/* 사이드바 — 화면 크기와 상관없이 토글 버튼을 눌러야 열리는 드로어 */
 .sidebar {
-  width: 240px;
-  flex-shrink: 0;
+  width: 260px;
   box-sizing: border-box;
   background: var(--card);
   padding: 32px 16px;
-  position: sticky;
+  position: fixed;
   top: 0;
+  right: 0;
   height: 100vh;
   overflow-y: auto;
-  order: 2;
+  transform: translateX(100%);
+  transition: transform 0.2s;
+  z-index: 50;
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.35);
+}
+
+.sidebar.open {
+  transform: translateX(0);
 }
 
 .sidebar-group {
@@ -149,8 +151,16 @@ body {
   display: none;
 }
 
+.sidebar-backdrop.open {
+  display: block;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 45;
+}
+
 .sidebar-toggle {
-  display: none;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 44px;
@@ -171,11 +181,6 @@ body {
 
 .sidebar-toggle:active {
   transform: scale(0.94);
-}
-
-.main-content {
-  flex: 1;
-  min-width: 0;
 }
 
 .page {
@@ -616,31 +621,7 @@ footer {
 /* 모바일 (약 360~430px 기준) */
 @media (max-width: 640px) {
   .sidebar {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 260px;
-    height: 100vh;
-    transform: translateX(100%);
-    transition: transform 0.2s;
-    z-index: 50;
-    box-shadow: -8px 0 24px rgba(0, 0, 0, 0.35);
-  }
-
-  .sidebar.open {
-    transform: translateX(0);
-  }
-
-  .sidebar-backdrop.open {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 45;
-  }
-
-  .sidebar-toggle {
-    display: inline-flex;
+    width: 85vw;
   }
 
   .page {
