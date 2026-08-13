@@ -100,6 +100,7 @@ body {
   top: 0;
   height: 100vh;
   overflow-y: auto;
+  order: 2;
 }
 
 .sidebar-group {
@@ -617,13 +618,13 @@ footer {
   .sidebar {
     position: fixed;
     top: 0;
-    left: 0;
+    right: 0;
     width: 260px;
     height: 100vh;
-    transform: translateX(-100%);
+    transform: translateX(100%);
     transition: transform 0.2s;
     z-index: 50;
-    box-shadow: 8px 0 24px rgba(0, 0, 0, 0.35);
+    box-shadow: -8px 0 24px rgba(0, 0, 0, 0.35);
   }
 
   .sidebar.open {
