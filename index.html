@@ -34,7 +34,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
-<link rel="stylesheet" href="css/style.css?v=5" />
+<link rel="stylesheet" href="css/style.css?v=6" />
 </head>
 <body>
 <div class="layout">
@@ -127,34 +127,81 @@
         <button type="button" class="info-btn" aria-label="자세히 보기">
           <span aria-hidden="true">ⓘ</span>
           <span class="info-tooltip">
-            <b>안전인출률(SWR)</b>: 매년 자산의 이 비율만큼만 인출해서 쓰면 원금이 잘 줄어들지 않는다고
-            가정하는 비율입니다. 흔히 4% 룰(연 생활비의 25배 자산)이 널리 쓰이며, 보수적으로 3~3.5%를
-            쓰기도 합니다.
+            <b>실질 인출률</b>: 예상 연 수익률에서 인플레이션을 뺀 값입니다. 은퇴 후 이 비율만큼만
+            인출해서 쓰면 자산의 실질 가치가 잘 줄어들지 않는다고 가정하고, 원하는 생활비를 충당하는 데
+            필요한 자산을 이 비율로 역산합니다.
           </span>
         </button>
       </h2>
-      <p class="card-desc-short">원하는 월 생활비를 입력하면, 그 생활비를 평생 유지하기 위한 낙원 금액을 계산합니다.</p>
+      <p class="card-desc-short">원하는 월 생활비와 은퇴 조건을 입력하면, 낙원을 이루기 위한 목표 자산을 계산합니다.</p>
 
+      <div class="field-group">
+        <label for="p-spend">원하는 월 생활비 (현재 기준)</label>
+        <div class="field-input-wrap">
+          <input type="text" inputmode="numeric" id="p-spend" placeholder="예: 300" />
+          <span class="field-suffix">만원</span>
+        </div>
+      </div>
       <div class="field-row">
         <div class="field-group">
-          <label for="p-spend">원하는 월 생활비</label>
+          <label for="p-rate">예상 연 수익률</label>
           <div class="field-input-wrap">
-            <input type="text" inputmode="numeric" id="p-spend" placeholder="예: 300" />
-            <span class="field-suffix">만원</span>
+            <input type="text" inputmode="decimal" id="p-rate" placeholder="예: 7" />
+            <span class="field-suffix">%</span>
           </div>
         </div>
         <div class="field-group">
-          <label for="p-swr">안전 인출률 (SWR)</label>
+          <label for="p-years">은퇴 시기</label>
           <div class="field-input-wrap">
-            <input type="text" inputmode="decimal" id="p-swr" placeholder="예: 4" value="4" />
-            <span class="field-suffix">%</span>
+            <input type="text" inputmode="numeric" id="p-years" placeholder="예: 20" />
+            <span class="field-suffix">년 후</span>
           </div>
+        </div>
+      </div>
+      <div class="field-group">
+        <label for="p-inflation">저축 증감율 (인플레이션)</label>
+        <div class="field-input-wrap">
+          <input type="text" inputmode="decimal" id="p-inflation" placeholder="예: 3" value="3" />
+          <span class="field-suffix">%</span>
         </div>
       </div>
 
       <button class="calc-btn" id="paradise-calc-btn">🔄 낙원 금액 계산하기</button>
 
       <div id="paradise-result"></div>
+
+      <div class="subsection-divider"></div>
+
+      <h3 class="subsection-title">🌱 은퇴 후 자산과 비교</h3>
+      <p class="card-desc-short">현재 자산과 월 저축액을 입력하면, 은퇴 시점 예상 자산과 낙원 금액의 차이를 계산합니다.</p>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label for="p-current-asset">현재 자산</label>
+          <div class="field-input-wrap">
+            <input type="text" inputmode="numeric" id="p-current-asset" placeholder="예: 5,000" />
+            <span class="field-suffix">만원</span>
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="p-monthly-saving">월 저축액</label>
+          <div class="field-input-wrap">
+            <input type="text" inputmode="numeric" id="p-monthly-saving" placeholder="예: 100" />
+            <span class="field-suffix">만원</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="calc-btn" id="paradise-compare-btn">🔄 은퇴 후 자산 계산하고 비교하기</button>
+
+      <div id="paradise-compare-result"></div>
+
+      <p class="tip-text" style="margin-top:24px;">
+        Tip. 낙원 금액 계산을 위해서는 위쪽 자산 목표 금액 부분의 예상 연 수익률·은퇴 시기·인플레이션을
+        입력해야 합니다.<br />
+        Tip. 월 생활비와 예상 수익률에 따라 낙원 금액이 달라집니다.<br />
+        Tip. 은퇴 후 자산을 계산하면 낙원 금액과의 차이를 확인할 수 있습니다.
+      </p>
     </div>
   </section>
 
@@ -167,6 +214,6 @@
   </div>
 </div>
 
-<script src="js/app.js?v=3"></script>
+<script src="js/app.js?v=4"></script>
 </body>
 </html>

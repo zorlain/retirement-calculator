@@ -200,56 +200,119 @@ function setupSim() {
 }
 
 /* ---------- 탭 2: 낙원 금액 (경제적 자유) ---------- */
+let paradiseState = null;
+
 function setupParadise() {
   bindThousandsInput("p-spend");
+  bindThousandsInput("p-current-asset");
+  bindThousandsInput("p-monthly-saving");
+
+  const tabsEl = document.getElementById("tabs");
+  tabsEl.addEventListener("click", (e) => {
+    const btn = e.target.closest(".tab-btn");
+    if (!btn || btn.dataset.tab !== "paradise" || !simState) return;
+    const assetEl = document.getElementById("p-current-asset");
+    const savingEl = document.getElementById("p-monthly-saving");
+    if (!assetEl.value) assetEl.value = simState.asset.toLocaleString("ko-KR");
+    if (!savingEl.value) savingEl.value = simState.saving.toLocaleString("ko-KR");
+  });
 
   document.getElementById("paradise-calc-btn").addEventListener("click", () => {
     const resultEl = document.getElementById("paradise-result");
     const monthlySpend = toNumber(document.getElementById("p-spend").value);
-    const swr = toNumber(document.getElementById("p-swr").value);
+    const rate = toNumber(document.getElementById("p-rate").value);
+    const years = Math.round(toNumber(document.getElementById("p-years").value));
+    const inflation = toNumber(document.getElementById("p-inflation").value);
 
-    if (!monthlySpend || monthlySpend <= 0 || !Number.isFinite(swr) || swr <= 0) {
-      resultEl.innerHTML = `<p class="result-placeholder">원하는 월 생활비와 안전 인출률을 입력해주세요.</p>`;
+    if (
+      !monthlySpend ||
+      monthlySpend <= 0 ||
+      !Number.isFinite(rate) ||
+      !years ||
+      years <= 0 ||
+      !Number.isFinite(inflation)
+    ) {
+      resultEl.innerHTML = `<p class="result-placeholder">월 생활비, 예상 연 수익률, 은퇴 시기, 인플레이션을 모두 입력합니다.</p>`;
+      paradiseState = null;
+      document.getElementById("paradise-compare-result").innerHTML = "";
       return;
     }
 
-    const paradiseAmount = (monthlySpend * 12) / (swr / 100);
-
-    let extra = "";
-    if (simState) {
-      const progressPct = Math.min(100, (simState.asset / paradiseAmount) * 100);
-      const capMonths = 100 * 12;
-      const months = monthsToReach(simState.asset, simState.saving, simState.rate, paradiseAmount, capMonths);
-      const etaText =
-        months === null
-          ? "현재 속도로는 100년 안에 도달하기 어려워요."
-          : months === 0
-          ? "이미 낙원 금액을 달성했어요!"
-          : `지금 속도로 약 ${(months / 12).toFixed(1)}년 후 도달 예상`;
-
-      extra = `
-        <div class="progress-wrap">
-          <div class="progress-track">
-            <div class="progress-fill" style="width:${progressPct}%"></div>
-          </div>
-          <div class="progress-label">
-            <span>현재 자산 ${formatManwon(simState.asset)} 기준 진행률</span>
-            <span>${progressPct.toFixed(1)}%</span>
-          </div>
-        </div>
-        <p class="result-hero-sub">${etaText}</p>
-      `;
-    } else {
-      extra = `<p class="tip-text" style="margin-top:20px;">🌱 자산 시뮬레이션 탭에서 먼저 계산하면, 지금 자산 기준 목표 달성 진행률과 예상 도달 시점도 함께 보여드려요.</p>`;
+    const realWithdrawalRate = rate - inflation;
+    if (realWithdrawalRate <= 0) {
+      resultEl.innerHTML = `<p class="result-placeholder">예상 연 수익률이 인플레이션보다 높아야 계산할 수 있습니다.</p>`;
+      paradiseState = null;
+      document.getElementById("paradise-compare-result").innerHTML = "";
+      return;
     }
+
+    const futureMonthlySpend = monthlySpend * Math.pow(1 + inflation / 100, years);
+    const paradiseAmount = (futureMonthlySpend * 12) / (realWithdrawalRate / 100);
+
+    paradiseState = { paradiseAmount, years, rate, inflation };
 
     resultEl.innerHTML = `
       <div class="result-hero">
-        <div class="result-hero-label">낙원 금액 (경제적 자유 자산)</div>
+        <div class="result-hero-label">${years}년 후 낙원을 이루기 위한 자산</div>
         <div class="result-hero-value">${formatManwon(paradiseAmount)}</div>
-        <div class="result-hero-sub">월 ${monthlySpend.toLocaleString("ko-KR")}만원 생활비 × 12 ÷ SWR ${swr}%</div>
+        <div class="result-hero-sub">실질 인출률 ${realWithdrawalRate.toFixed(1)}% (수익률 ${rate}% − 인플레이션 ${inflation}%) 기준</div>
       </div>
-      ${extra}
+      <div class="result-grid">
+        <div class="result-stat">
+          <div class="result-stat-label">현재 기준 월 생활비</div>
+          <div class="result-stat-value">${formatManwon(monthlySpend)}</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-label">${years}년 후 월 생활비(인플레 반영)</div>
+          <div class="result-stat-value">${formatManwon(futureMonthlySpend)}</div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById("paradise-compare-result").innerHTML = "";
+  });
+
+  document.getElementById("paradise-compare-btn").addEventListener("click", () => {
+    const resultEl = document.getElementById("paradise-compare-result");
+    if (!paradiseState) {
+      resultEl.innerHTML = `<p class="result-placeholder">위에서 낙원 금액을 먼저 계산합니다.</p>`;
+      return;
+    }
+
+    const currentAsset = toNumber(document.getElementById("p-current-asset").value) || 0;
+    const monthlySaving = toNumber(document.getElementById("p-monthly-saving").value) || 0;
+
+    const { finalBalance } = simulateGrowth(currentAsset, monthlySaving, paradiseState.rate, paradiseState.years);
+    const diff = finalBalance - paradiseState.paradiseAmount;
+    const progressPct = Math.min(100, (finalBalance / paradiseState.paradiseAmount) * 100);
+
+    resultEl.innerHTML = `
+      <div class="result-hero">
+        <div class="result-hero-label">${paradiseState.years}년 후 예상 자산</div>
+        <div class="result-hero-value">${formatManwon(finalBalance)}</div>
+      </div>
+      <div class="result-grid">
+        <div class="result-stat">
+          <div class="result-stat-label">낙원 금액과의 차이</div>
+          <div class="result-stat-value ${diff >= 0 ? "positive" : "negative"}">${diff >= 0 ? "+" : "-"}${formatManwon(Math.abs(diff))}</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-stat-label">목표 달성률</div>
+          <div class="result-stat-value">${progressPct.toFixed(1)}%</div>
+        </div>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-track">
+          <div class="progress-fill" style="width:${progressPct}%"></div>
+        </div>
+      </div>
+      <p class="result-hero-sub" style="text-align:center;margin-top:14px;">
+        ${
+          diff >= 0
+            ? "낙원 금액을 달성할 것으로 예상됩니다."
+            : `낙원 금액에는 ${formatManwon(Math.abs(diff))} 부족할 것으로 예상됩니다.`
+        }
+      </p>
     `;
   });
 }

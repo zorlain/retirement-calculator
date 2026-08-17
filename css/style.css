@@ -618,6 +618,19 @@ footer {
   line-height: 1.8;
 }
 
+/* 카드 내부 하위 섹션 구분 */
+.subsection-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 32px 0 24px;
+}
+
+.subsection-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 6px;
+}
+
 /* 모바일 (약 360~430px 기준) */
 @media (max-width: 640px) {
   .sidebar {
