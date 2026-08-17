@@ -276,6 +276,9 @@ header.hero p {
   background: var(--card-elevated);
   border-radius: 16px;
   padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .result-panel:empty {
