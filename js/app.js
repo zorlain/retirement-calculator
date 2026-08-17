@@ -209,7 +209,7 @@ function refreshDownstreamFromGoal() {
   if (!goalState) {
     savingContext.textContent = "먼저 위에서 목표 자산을 계산합니다.";
     document.getElementById("progress-context").textContent = "먼저 위 단계를 계산합니다.";
-    depletionContext.textContent = "먼저 1단계에서 목표 자산을 계산합니다.";
+    depletionContext.textContent = "먼저 위에서 목표 자산을 계산합니다.";
     document.getElementById("saving-result").innerHTML = "";
     document.getElementById("progress-result").innerHTML = "";
     document.getElementById("depletion-result").innerHTML = "";
@@ -243,7 +243,7 @@ function recalcSaving() {
   const progressContext = document.getElementById("progress-context");
 
   if (!goalState) {
-    resultEl.innerHTML = `<p class="result-placeholder">먼저 1단계에서 목표 자산을 계산합니다.</p>`;
+    resultEl.innerHTML = `<p class="result-placeholder">먼저 위에서 목표 자산을 계산합니다.</p>`;
     savingState = null;
     progressContext.textContent = "먼저 위 단계를 계산합니다.";
     document.getElementById("progress-result").innerHTML = "";
@@ -264,7 +264,7 @@ function recalcSaving() {
         <div class="result-hero-sub">현재 자산만으로도 ${goalState.years}년 후 목표(${formatManwon(goalState.target)})에 도달합니다.</div>
       </div>
     `;
-    progressContext.textContent = "2단계 결과를 기준으로 계산합니다.";
+    progressContext.textContent = "위 결과를 기준으로 계산합니다.";
     const plannedEl = document.getElementById("progress-planned-saving");
     if (!plannedEl.value) plannedEl.value = "0";
     recalcProgress();
@@ -350,7 +350,7 @@ function setupProgress() {
 function recalcDepletion() {
   const resultEl = document.getElementById("depletion-result");
   if (!goalState) {
-    resultEl.innerHTML = `<p class="result-placeholder">먼저 1단계에서 목표 자산을 계산합니다.</p>`;
+    resultEl.innerHTML = `<p class="result-placeholder">먼저 위에서 목표 자산을 계산합니다.</p>`;
     return;
   }
 
