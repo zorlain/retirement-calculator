@@ -78,22 +78,6 @@ function initSidebar() {
   backdrop.addEventListener("click", close);
 }
 
-/* ---------- 은퇴자산 시뮬레이션 (매달 복리) ----------
-   매달: 잔액 = 잔액 * (1 + 월수익률) + 월저축액.
-   연 단위 스냅샷을 함께 남겨 성장 그래프에 사용한다. */
-function simulateGrowth(startAsset, monthlySaving, annualRatePct, years) {
-  const monthlyRate = annualRatePct / 100 / 12;
-  let balance = startAsset;
-  const yearly = [Math.round(balance)];
-  for (let y = 1; y <= years; y++) {
-    for (let m = 0; m < 12; m++) {
-      balance = balance * (1 + monthlyRate) + monthlySaving;
-    }
-    yearly.push(Math.round(balance));
-  }
-  return { finalBalance: balance, yearly };
-}
-
 /* 자산이 매달 인출되어 소진되는 과정을 시뮬레이션 (연 단위로 인출액이 증가) */
 function simulateDepletion(startAsset, initialMonthlyWithdrawal, annualRatePct, inflationPct, capYears) {
   const monthlyRate = annualRatePct / 100 / 12;
@@ -150,7 +134,6 @@ function renderGrowthChart(yearly, title, maxBars = 16) {
 /* ---------- 상태 ---------- */
 let goalState = null; // 1단계 결과: { target, years, rate, inflation, monthlySpend, futureMonthlySpend }
 let savingState = null; // 2단계 결과: { currentAsset, requiredSaving }
-let progressPlannedTouched = false; // 사용자가 월 저축 계획액을 직접 수정했는지 여부
 
 /* ---------- 1단계: 목표 자산 계산 ---------- */
 function recalcGoal() {
@@ -208,7 +191,6 @@ function refreshDownstreamFromGoal() {
   if (!goalState) {
     depletionContext.textContent = "먼저 위에서 목표 자산을 계산합니다.";
     document.getElementById("saving-result").innerHTML = "";
-    document.getElementById("progress-result").innerHTML = "";
     document.getElementById("depletion-result").innerHTML = "";
     savingState = null;
     return;
@@ -238,7 +220,6 @@ function recalcSaving() {
   if (!goalState) {
     resultEl.innerHTML = "";
     savingState = null;
-    document.getElementById("progress-result").innerHTML = "";
     return;
   }
 
@@ -256,8 +237,6 @@ function recalcSaving() {
         <div class="result-hero-sub">현재 자산만으로도 ${goalState.years}년 후 목표(${formatManwon(goalState.target)})에 도달합니다.</div>
       </div>
     `;
-    if (!progressPlannedTouched) document.getElementById("progress-planned-saving").value = "0";
-    recalcProgress();
     return;
   }
 
@@ -275,68 +254,11 @@ function recalcSaving() {
       <div class="result-hero-sub">${goalState.years}년 후 ${formatManwon(goalState.target)} 목표 기준</div>
     </div>
   `;
-
-  if (!progressPlannedTouched) {
-    document.getElementById("progress-planned-saving").value = Math.max(0, Math.round(requiredSaving)).toLocaleString("ko-KR");
-  }
-
-  recalcProgress();
 }
 
 function setupSaving() {
   bindThousandsInput("saving-current-asset");
   document.getElementById("saving-current-asset").addEventListener("input", recalcSaving);
-}
-
-/* ---------- 3단계: 목표 달성 진행률 확인 ---------- */
-function recalcProgress() {
-  const resultEl = document.getElementById("progress-result");
-  if (!goalState || !savingState) {
-    resultEl.innerHTML = "";
-    return;
-  }
-
-  const plannedSaving = toNumber(document.getElementById("progress-planned-saving").value) || 0;
-  const { finalBalance } = simulateGrowth(savingState.currentAsset, plannedSaving, goalState.rate, goalState.years);
-  const diff = finalBalance - goalState.target;
-  const progressPct = Math.min(100, (finalBalance / goalState.target) * 100);
-
-  resultEl.innerHTML = `
-    <div class="result-hero">
-      <div class="result-hero-label">${goalState.years}년 후 예상 자산</div>
-      <div class="result-hero-value">${formatManwon(finalBalance)}</div>
-    </div>
-    <div class="result-grid">
-      <div class="result-stat">
-        <div class="result-stat-label">목표 자산과의 차이</div>
-        <div class="result-stat-value ${diff >= 0 ? "positive" : "negative"}">${diff >= 0 ? "+" : "-"}${formatManwon(Math.abs(diff))}</div>
-      </div>
-      <div class="result-stat">
-        <div class="result-stat-label">목표 달성률</div>
-        <div class="result-stat-value">${progressPct.toFixed(1)}%</div>
-      </div>
-    </div>
-    <div class="progress-wrap">
-      <div class="progress-track">
-        <div class="progress-fill" style="width:${progressPct}%"></div>
-      </div>
-    </div>
-    <p class="result-hero-sub" style="text-align:center;margin-top:14px;">
-      ${
-        diff >= 0
-          ? "목표 자산을 달성할 것으로 예상됩니다."
-          : `목표 자산에는 ${formatManwon(Math.abs(diff))} 부족할 것으로 예상됩니다.`
-      }
-    </p>
-  `;
-}
-
-function setupProgress() {
-  bindThousandsInput("progress-planned-saving");
-  document.getElementById("progress-planned-saving").addEventListener("input", () => {
-    progressPlannedTouched = true;
-    recalcProgress();
-  });
 }
 
 /* ---------- 4단계: 은퇴 후 자산 소진 검증 ---------- */
@@ -394,7 +316,6 @@ function init() {
   initInfoTooltips();
   setupGoal();
   setupSaving();
-  setupProgress();
   setupDepletion();
   recalcGoal();
 }

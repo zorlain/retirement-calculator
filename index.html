@@ -34,7 +34,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
-<link rel="stylesheet" href="css/style.css?v=15" />
+<link rel="stylesheet" href="css/style.css?v=16" />
 </head>
 <body>
 <div class="layout">
@@ -78,20 +78,11 @@
     </h2>
     <p class="card-desc-short">원하는 월 생활비와 은퇴 조건을 입력하면, 낙원을 이루기 위한 목표 자산과 필요 월 저축액을 계산합니다.</p>
 
-    <div class="field-row">
-      <div class="field-group">
-        <label for="saving-current-asset">현재 자산</label>
-        <div class="field-input-wrap">
-          <input type="text" autocomplete="off" inputmode="numeric" id="saving-current-asset" placeholder="예: 5,000" />
-          <span class="field-suffix">만원</span>
-        </div>
-      </div>
-      <div class="field-group">
-        <label for="progress-planned-saving">월 저축 계획액 (선택)</label>
-        <div class="field-input-wrap">
-          <input type="text" autocomplete="off" inputmode="numeric" id="progress-planned-saving" placeholder="예: 100" />
-          <span class="field-suffix">만원</span>
-        </div>
+    <div class="field-group">
+      <label for="saving-current-asset">현재 자산</label>
+      <div class="field-input-wrap">
+        <input type="text" autocomplete="off" inputmode="numeric" id="saving-current-asset" placeholder="예: 5,000" />
+        <span class="field-suffix">만원</span>
       </div>
     </div>
     <div class="field-group">
@@ -128,7 +119,6 @@
     <div class="result-panel">
       <div id="goal-result"></div>
       <div class="result-block" id="saving-result"></div>
-      <div class="result-block" id="progress-result"></div>
     </div>
   </section>
 
@@ -186,6 +176,6 @@
   </div>
 </div>
 
-<script src="js/app.js?v=8"></script>
+<script src="js/app.js?v=9"></script>
 </body>
 </html>
