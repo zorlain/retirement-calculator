@@ -522,6 +522,8 @@ header.hero p {
 
 .result-stat-value.positive { color: var(--positive); }
 .result-stat-value.negative { color: var(--negative); }
+.result-hero-value.positive { color: var(--positive); }
+.result-hero-value.negative { color: var(--negative); }
 
 .result-placeholder {
   color: var(--text-muted);

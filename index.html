@@ -34,7 +34,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
-<link rel="stylesheet" href="css/style.css?v=6" />
+<link rel="stylesheet" href="css/style.css?v=7" />
 </head>
 <body>
 <div class="layout">
@@ -63,64 +63,12 @@
   </header>
 
   <nav class="tabs" id="tabs">
-    <button class="tab-btn active" data-tab="sim">🌱 자산 시뮬레이션</button>
-    <button class="tab-btn" data-tab="paradise">🏝️ 낙원 금액</button>
+    <button class="tab-btn active" data-tab="paradise">🏝️ 낙원 금액</button>
+    <button class="tab-btn" data-tab="plan">🧮 저축·인출 계획</button>
   </nav>
 
-  <!-- 탭 1: 은퇴자산 시뮬레이션 -->
-  <section class="tab-panel" data-tab-panel="sim">
-    <div class="card">
-      <h2>
-        🌱 은퇴자산 시뮬레이션
-        <button type="button" class="info-btn" aria-label="자세히 보기">
-          <span aria-hidden="true">ⓘ</span>
-          <span class="info-tooltip">
-            현재 자산에서 시작해 매달 저축액을 더하고, 입력한 연 수익률로 매달 복리 성장한다고 가정해
-            지정한 기간 뒤의 예상 자산을 계산합니다.
-          </span>
-        </button>
-      </h2>
-      <p class="card-desc-short">현재 자산과 월 저축액을 입력하면 목표 기간 뒤의 예상 자산을 계산해드려요.</p>
-
-      <div class="field-group">
-        <label for="s-asset">현재 자산</label>
-        <div class="field-input-wrap">
-          <input type="text" inputmode="numeric" id="s-asset" placeholder="예: 5,000" />
-          <span class="field-suffix">만원</span>
-        </div>
-      </div>
-      <div class="field-row">
-        <div class="field-group">
-          <label for="s-saving">월 저축액</label>
-          <div class="field-input-wrap">
-            <input type="text" inputmode="numeric" id="s-saving" placeholder="예: 100" />
-            <span class="field-suffix">만원</span>
-          </div>
-        </div>
-        <div class="field-group">
-          <label for="s-rate">예상 연 수익률</label>
-          <div class="field-input-wrap">
-            <input type="text" inputmode="decimal" id="s-rate" placeholder="예: 7" />
-            <span class="field-suffix">%</span>
-          </div>
-        </div>
-      </div>
-      <div class="field-group">
-        <label for="s-years">시뮬레이션 기간</label>
-        <div class="field-input-wrap">
-          <input type="text" inputmode="numeric" id="s-years" placeholder="예: 20" />
-          <span class="field-suffix">년</span>
-        </div>
-      </div>
-
-      <button class="calc-btn" id="sim-calc-btn">🔄 계산하기</button>
-
-      <div id="sim-result"></div>
-    </div>
-  </section>
-
-  <!-- 탭 2: 낙원 금액 -->
-  <section class="tab-panel" data-tab-panel="paradise" hidden>
+  <!-- 탭 1: 낙원 금액 -->
+  <section class="tab-panel" data-tab-panel="paradise">
     <div class="card">
       <h2>
         🏝️ 낙원 금액 계산 (경제적 자유)
@@ -205,6 +153,104 @@
     </div>
   </section>
 
+  <!-- 탭 2: 저축·인출 계획 -->
+  <section class="tab-panel" data-tab-panel="plan" hidden>
+    <div class="card">
+      <h2>
+        💰 필요 월 저축액 계산
+        <button type="button" class="info-btn" aria-label="자세히 보기">
+          <span aria-hidden="true">ⓘ</span>
+          <span class="info-tooltip">
+            목표 자산에서 현재 자산의 미래 가치를 뺀 금액을, 지정한 기간 동안 매달 복리로 저축한다고
+            가정해 필요한 월 저축액을 역산합니다. 낙원 금액 탭에서 계산한 목표 자산이 자동으로 채워집니다.
+          </span>
+        </button>
+      </h2>
+      <p class="card-desc-short">목표 자산과 현재 자산, 기간을 입력하면 목표 달성에 필요한 월 저축액을 계산합니다.</p>
+
+      <div class="field-group">
+        <label for="plan-target">목표 자산</label>
+        <div class="field-input-wrap">
+          <input type="text" inputmode="numeric" id="plan-target" placeholder="예: 50,000" />
+          <span class="field-suffix">만원</span>
+        </div>
+      </div>
+      <div class="field-group">
+        <label for="plan-current-asset">현재 자산</label>
+        <div class="field-input-wrap">
+          <input type="text" inputmode="numeric" id="plan-current-asset" placeholder="예: 5,000" />
+          <span class="field-suffix">만원</span>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label for="plan-rate">예상 연 수익률</label>
+          <div class="field-input-wrap">
+            <input type="text" inputmode="decimal" id="plan-rate" placeholder="예: 7" />
+            <span class="field-suffix">%</span>
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="plan-years">목표 기간</label>
+          <div class="field-input-wrap">
+            <input type="text" inputmode="numeric" id="plan-years" placeholder="예: 20" />
+            <span class="field-suffix">년</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="calc-btn" id="plan-calc-btn">🔄 필요 저축액 계산하기</button>
+
+      <div id="plan-result"></div>
+
+      <div class="subsection-divider"></div>
+
+      <h3 class="subsection-title">📉 은퇴 후 자산 소진 시뮬레이션</h3>
+      <p class="card-desc-short">은퇴 시점 자산과 월 인출액을 입력하면, 자산이 몇 년 동안 유지되는지 계산합니다.</p>
+
+      <div class="field-group">
+        <label for="plan-retire-asset">은퇴 시점 자산</label>
+        <div class="field-input-wrap">
+          <input type="text" inputmode="numeric" id="plan-retire-asset" placeholder="예: 50,000" />
+          <span class="field-suffix">만원</span>
+        </div>
+      </div>
+      <div class="field-group">
+        <label for="plan-withdrawal">월 인출액 (생활비)</label>
+        <div class="field-input-wrap">
+          <input type="text" inputmode="numeric" id="plan-withdrawal" placeholder="예: 300" />
+          <span class="field-suffix">만원</span>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label for="plan-depletion-rate">예상 연 수익률</label>
+          <div class="field-input-wrap">
+            <input type="text" inputmode="decimal" id="plan-depletion-rate" placeholder="예: 7" />
+            <span class="field-suffix">%</span>
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="plan-depletion-inflation">인출액 증가율 (인플레이션)</label>
+          <div class="field-input-wrap">
+            <input type="text" inputmode="decimal" id="plan-depletion-inflation" placeholder="예: 3" />
+            <span class="field-suffix">%</span>
+          </div>
+        </div>
+      </div>
+
+      <button class="calc-btn" id="plan-depletion-btn">🔄 자산 소진 시뮬레이션하기</button>
+
+      <div id="plan-depletion-result"></div>
+
+      <p class="tip-text" style="margin-top:24px;">
+        Tip. 낙원 금액 탭에서 먼저 계산하면, 목표 자산·수익률·인출액이 이 탭에 자동으로 채워집니다.<br />
+        Tip. 자산 소진 시뮬레이션은 최대 60년까지만 계산합니다. 60년 후에도 자산이 남아있으면 소진되지
+        않는 것으로 판단합니다.
+      </p>
+    </div>
+  </section>
+
   <footer>
     이 계산기는 매달 복리 성장과 일정한 안전인출률(SWR)을 가정한 참고용 시뮬레이션이며, 실제 투자수익률·물가상승률·세금 등에
     따라 결과가 크게 달라질 수 있습니다. 중요한 은퇴·투자 계획은 반드시 전문가와 상담하세요.
@@ -214,6 +260,6 @@
   </div>
 </div>
 
-<script src="js/app.js?v=4"></script>
+<script src="js/app.js?v=5"></script>
 </body>
 </html>

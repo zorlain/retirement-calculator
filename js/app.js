@@ -108,20 +108,29 @@ function simulateGrowth(startAsset, monthlySaving, annualRatePct, years) {
   return { finalBalance: balance, yearly };
 }
 
-/* 목표 금액에 도달하기까지 걸리는 개월 수 (최대 capMonths까지 시뮬레이션) */
-function monthsToReach(startAsset, monthlySaving, annualRatePct, target, capMonths) {
+/* 자산이 매달 인출되어 소진되는 과정을 시뮬레이션 (연 단위로 인출액이 증가) */
+function simulateDepletion(startAsset, initialMonthlyWithdrawal, annualRatePct, inflationPct, capYears) {
   const monthlyRate = annualRatePct / 100 / 12;
   let balance = startAsset;
-  if (balance >= target) return 0;
-  for (let m = 1; m <= capMonths; m++) {
-    balance = balance * (1 + monthlyRate) + monthlySaving;
-    if (balance >= target) return m;
+  let withdrawal = initialMonthlyWithdrawal;
+  const yearly = [Math.round(balance)];
+
+  for (let y = 1; y <= capYears; y++) {
+    for (let m = 0; m < 12; m++) {
+      balance = balance * (1 + monthlyRate) - withdrawal;
+      if (balance <= 0) {
+        yearly.push(0);
+        return { depleted: true, years: y - 1 + (m + 1) / 12, yearly };
+      }
+    }
+    yearly.push(Math.round(balance));
+    withdrawal = withdrawal * (1 + inflationPct / 100);
   }
-  return null;
+  return { depleted: false, years: capYears, finalBalance: balance, yearly };
 }
 
-/* ---------- 연도별 자산 성장 막대그래프 ---------- */
-function renderGrowthChart(yearly) {
+/* ---------- 연도별 자산 증감 막대그래프 ---------- */
+function renderGrowthChart(yearly, title) {
   const years = yearly.length - 1;
   const maxBars = 16;
   const step = Math.max(1, Math.ceil(years / maxBars));
@@ -147,56 +156,10 @@ function renderGrowthChart(yearly) {
 
   return `
     <div class="growth-chart">
-      <div class="growth-chart-title">연도별 예상 자산 성장</div>
+      <div class="growth-chart-title">${title || "연도별 예상 자산 성장"}</div>
       <div class="growth-chart-bars">${bars}</div>
     </div>
   `;
-}
-
-/* ---------- 상태 ---------- */
-let simState = null;
-
-/* ---------- 탭 1: 자산 시뮬레이션 ---------- */
-function setupSim() {
-  bindThousandsInput("s-asset");
-  bindThousandsInput("s-saving");
-
-  document.getElementById("sim-calc-btn").addEventListener("click", () => {
-    const asset = toNumber(document.getElementById("s-asset").value) || 0;
-    const saving = toNumber(document.getElementById("s-saving").value) || 0;
-    const rate = toNumber(document.getElementById("s-rate").value);
-    const years = Math.round(toNumber(document.getElementById("s-years").value));
-    const resultEl = document.getElementById("sim-result");
-
-    if (!years || years <= 0 || !Number.isFinite(rate)) {
-      resultEl.innerHTML = `<p class="result-placeholder">예상 연 수익률과 시뮬레이션 기간을 입력해주세요.</p>`;
-      return;
-    }
-
-    const { finalBalance, yearly } = simulateGrowth(asset, saving, rate, years);
-    const totalContribution = asset + saving * 12 * years;
-    const totalReturn = finalBalance - totalContribution;
-
-    simState = { asset, saving, rate, years, finalBalance };
-
-    resultEl.innerHTML = `
-      <div class="result-hero">
-        <div class="result-hero-label">${years}년 후 예상 자산</div>
-        <div class="result-hero-value">${formatManwon(finalBalance)}</div>
-      </div>
-      <div class="result-grid">
-        <div class="result-stat">
-          <div class="result-stat-label">총 납입액(현재 자산 포함)</div>
-          <div class="result-stat-value">${formatManwon(totalContribution)}</div>
-        </div>
-        <div class="result-stat">
-          <div class="result-stat-label">투자 수익</div>
-          <div class="result-stat-value positive">${formatManwon(totalReturn)}</div>
-        </div>
-      </div>
-      ${renderGrowthChart(yearly)}
-    `;
-  });
 }
 
 /* ---------- 탭 2: 낙원 금액 (경제적 자유) ---------- */
@@ -206,16 +169,6 @@ function setupParadise() {
   bindThousandsInput("p-spend");
   bindThousandsInput("p-current-asset");
   bindThousandsInput("p-monthly-saving");
-
-  const tabsEl = document.getElementById("tabs");
-  tabsEl.addEventListener("click", (e) => {
-    const btn = e.target.closest(".tab-btn");
-    if (!btn || btn.dataset.tab !== "paradise" || !simState) return;
-    const assetEl = document.getElementById("p-current-asset");
-    const savingEl = document.getElementById("p-monthly-saving");
-    if (!assetEl.value) assetEl.value = simState.asset.toLocaleString("ko-KR");
-    if (!savingEl.value) savingEl.value = simState.saving.toLocaleString("ko-KR");
-  });
 
   document.getElementById("paradise-calc-btn").addEventListener("click", () => {
     const resultEl = document.getElementById("paradise-result");
@@ -249,7 +202,7 @@ function setupParadise() {
     const futureMonthlySpend = monthlySpend * Math.pow(1 + inflation / 100, years);
     const paradiseAmount = (futureMonthlySpend * 12) / (realWithdrawalRate / 100);
 
-    paradiseState = { paradiseAmount, years, rate, inflation };
+    paradiseState = { paradiseAmount, years, rate, inflation, futureMonthlySpend };
 
     resultEl.innerHTML = `
       <div class="result-hero">
@@ -317,13 +270,126 @@ function setupParadise() {
   });
 }
 
+/* ---------- 탭 2: 저축·인출 계획 ---------- */
+function setupPlan() {
+  bindThousandsInput("plan-target");
+  bindThousandsInput("plan-current-asset");
+  bindThousandsInput("plan-retire-asset");
+  bindThousandsInput("plan-withdrawal");
+
+  document.getElementById("tabs").addEventListener("click", (e) => {
+    const btn = e.target.closest(".tab-btn");
+    if (!btn || btn.dataset.tab !== "plan" || !paradiseState) return;
+
+    const targetEl = document.getElementById("plan-target");
+    const rateEl = document.getElementById("plan-rate");
+    const yearsEl = document.getElementById("plan-years");
+    const retireAssetEl = document.getElementById("plan-retire-asset");
+    const withdrawalEl = document.getElementById("plan-withdrawal");
+    const depletionRateEl = document.getElementById("plan-depletion-rate");
+    const depletionInflationEl = document.getElementById("plan-depletion-inflation");
+
+    if (!targetEl.value) targetEl.value = Math.round(paradiseState.paradiseAmount).toLocaleString("ko-KR");
+    if (!rateEl.value) rateEl.value = paradiseState.rate;
+    if (!yearsEl.value) yearsEl.value = paradiseState.years;
+    if (!retireAssetEl.value) retireAssetEl.value = Math.round(paradiseState.paradiseAmount).toLocaleString("ko-KR");
+    if (!withdrawalEl.value) withdrawalEl.value = Math.round(paradiseState.futureMonthlySpend).toLocaleString("ko-KR");
+    if (!depletionRateEl.value) depletionRateEl.value = paradiseState.rate;
+    if (!depletionInflationEl.value) depletionInflationEl.value = paradiseState.inflation;
+  });
+
+  document.getElementById("plan-calc-btn").addEventListener("click", () => {
+    const resultEl = document.getElementById("plan-result");
+    const target = toNumber(document.getElementById("plan-target").value);
+    const current = toNumber(document.getElementById("plan-current-asset").value) || 0;
+    const rate = toNumber(document.getElementById("plan-rate").value);
+    const years = Math.round(toNumber(document.getElementById("plan-years").value));
+
+    if (!target || target <= 0 || !Number.isFinite(rate) || !years || years <= 0) {
+      resultEl.innerHTML = `<p class="result-placeholder">목표 자산, 예상 연 수익률, 목표 기간을 모두 입력합니다.</p>`;
+      return;
+    }
+
+    const monthlyRate = rate / 100 / 12;
+    const months = years * 12;
+    const futureValueOfCurrent = current * Math.pow(1 + monthlyRate, months);
+
+    if (futureValueOfCurrent >= target) {
+      resultEl.innerHTML = `
+        <div class="result-hero">
+          <div class="result-hero-label">필요 월 저축액</div>
+          <div class="result-hero-value positive">0원</div>
+          <div class="result-hero-sub">현재 자산만으로도 ${years}년 후 목표(${formatManwon(target)})에 도달합니다.</div>
+        </div>
+      `;
+      return;
+    }
+
+    const requiredSaving =
+      monthlyRate === 0
+        ? (target - futureValueOfCurrent) / months
+        : (target - futureValueOfCurrent) / ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+
+    resultEl.innerHTML = `
+      <div class="result-hero">
+        <div class="result-hero-label">목표 달성을 위한 필요 월 저축액</div>
+        <div class="result-hero-value">${formatManwon(requiredSaving)}</div>
+        <div class="result-hero-sub">${years}년 후 ${formatManwon(target)} 목표 기준</div>
+      </div>
+    `;
+  });
+
+  document.getElementById("plan-depletion-btn").addEventListener("click", () => {
+    const resultEl = document.getElementById("plan-depletion-result");
+    const retireAsset = toNumber(document.getElementById("plan-retire-asset").value);
+    const withdrawal = toNumber(document.getElementById("plan-withdrawal").value);
+    const rate = toNumber(document.getElementById("plan-depletion-rate").value);
+    const inflation = toNumber(document.getElementById("plan-depletion-inflation").value);
+
+    if (
+      !retireAsset ||
+      retireAsset <= 0 ||
+      !withdrawal ||
+      withdrawal <= 0 ||
+      !Number.isFinite(rate) ||
+      !Number.isFinite(inflation)
+    ) {
+      resultEl.innerHTML = `<p class="result-placeholder">은퇴 시점 자산, 월 인출액, 예상 연 수익률, 인플레이션을 모두 입력합니다.</p>`;
+      return;
+    }
+
+    const capYears = 60;
+    const result = simulateDepletion(retireAsset, withdrawal, rate, inflation, capYears);
+
+    if (result.depleted) {
+      resultEl.innerHTML = `
+        <div class="result-hero">
+          <div class="result-hero-label">자산 소진까지 예상 기간</div>
+          <div class="result-hero-value negative">약 ${result.years.toFixed(1)}년</div>
+          <div class="result-hero-sub">이 시점 이후에도 같은 조건으로 인출을 지속하면 자산이 바닥날 것으로 예상됩니다.</div>
+        </div>
+        ${renderGrowthChart(result.yearly, "연도별 예상 자산 잔액")}
+      `;
+    } else {
+      resultEl.innerHTML = `
+        <div class="result-hero">
+          <div class="result-hero-label">${capYears}년 후 잔액</div>
+          <div class="result-hero-value positive">${formatManwon(result.finalBalance)}</div>
+          <div class="result-hero-sub">${capYears}년 동안 자산이 소진되지 않을 것으로 예상됩니다.</div>
+        </div>
+        ${renderGrowthChart(result.yearly, "연도별 예상 자산 잔액")}
+      `;
+    }
+  });
+}
+
 function init() {
   initThemeToggle();
   initSidebar();
   initTabs();
   initInfoTooltips();
-  setupSim();
   setupParadise();
+  setupPlan();
 }
 
 document.addEventListener("DOMContentLoaded", init);
