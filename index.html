@@ -34,7 +34,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
-<link rel="stylesheet" href="css/style.css?v=12" />
+<link rel="stylesheet" href="css/style.css?v=13" />
 </head>
 <body>
 <div class="layout">
@@ -64,74 +64,70 @@
 
   <!-- 목표 자산 + 필요 저축액 + 진행률 (통합) -->
   <section class="card">
-    <div class="card-split">
-      <div class="card-split-inputs">
-        <h2>
-          🏝️ 목표 자산 계산 (낙원 금액)
-          <button type="button" class="info-btn" aria-label="자세히 보기">
-            <span aria-hidden="true">ⓘ</span>
-            <span class="info-tooltip">
-              <b>실질 인출률</b>: 예상 연 수익률에서 인플레이션을 뺀 값입니다. 은퇴 후 이 비율만큼만
-              인출해서 쓰면 자산의 실질 가치가 잘 줄어들지 않는다고 가정하고, 원하는 생활비를 충당하는 데
-              필요한 자산을 이 비율로 역산합니다.
-            </span>
-          </button>
-        </h2>
-        <p class="card-desc-short">원하는 월 생활비와 은퇴 조건을 입력하면, 낙원을 이루기 위한 목표 자산과 필요 월 저축액을 계산합니다.</p>
+    <h2>
+      🏝️ 목표 자산 계산 (낙원 금액)
+      <button type="button" class="info-btn" aria-label="자세히 보기">
+        <span aria-hidden="true">ⓘ</span>
+        <span class="info-tooltip">
+          <b>실질 인출률</b>: 예상 연 수익률에서 인플레이션을 뺀 값입니다. 은퇴 후 이 비율만큼만
+          인출해서 쓰면 자산의 실질 가치가 잘 줄어들지 않는다고 가정하고, 원하는 생활비를 충당하는 데
+          필요한 자산을 이 비율로 역산합니다.
+        </span>
+      </button>
+    </h2>
+    <p class="card-desc-short">원하는 월 생활비와 은퇴 조건을 입력하면, 낙원을 이루기 위한 목표 자산과 필요 월 저축액을 계산합니다.</p>
 
-        <div class="field-group">
-          <label for="goal-spend">원하는 월 생활비 (현재 기준)</label>
-          <div class="field-input-wrap">
-            <input type="text" autocomplete="off" inputmode="numeric" id="goal-spend" placeholder="예: 300" />
-            <span class="field-suffix">만원</span>
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="field-group">
-            <label for="goal-rate">예상 연 수익률</label>
-            <div class="field-input-wrap">
-              <input type="text" autocomplete="off" inputmode="decimal" id="goal-rate" placeholder="예: 7" />
-              <span class="field-suffix">%</span>
-            </div>
-          </div>
-          <div class="field-group">
-            <label for="goal-years">은퇴 시기</label>
-            <div class="field-input-wrap">
-              <input type="text" autocomplete="off" inputmode="numeric" id="goal-years" placeholder="예: 20" />
-              <span class="field-suffix">년 후</span>
-            </div>
-          </div>
-        </div>
-        <div class="field-group">
-          <label for="goal-inflation">저축 증감율 (인플레이션)</label>
-          <div class="field-input-wrap">
-            <input type="text" autocomplete="off" inputmode="decimal" id="goal-inflation" placeholder="예: 3" value="3" />
-            <span class="field-suffix">%</span>
-          </div>
-        </div>
-        <div class="field-row">
-          <div class="field-group">
-            <label for="saving-current-asset">현재 자산</label>
-            <div class="field-input-wrap">
-              <input type="text" autocomplete="off" inputmode="numeric" id="saving-current-asset" placeholder="예: 5,000" />
-              <span class="field-suffix">만원</span>
-            </div>
-          </div>
-          <div class="field-group">
-            <label for="progress-planned-saving">월 저축 계획액 (선택)</label>
-            <div class="field-input-wrap">
-              <input type="text" autocomplete="off" inputmode="numeric" id="progress-planned-saving" placeholder="예: 100" />
-              <span class="field-suffix">만원</span>
-            </div>
-          </div>
+    <div class="field-row">
+      <div class="field-group">
+        <label for="saving-current-asset">현재 자산</label>
+        <div class="field-input-wrap">
+          <input type="text" autocomplete="off" inputmode="numeric" id="saving-current-asset" placeholder="예: 5,000" />
+          <span class="field-suffix">만원</span>
         </div>
       </div>
-
-      <div class="card-split-result">
-        <div id="goal-result"></div>
-        <div class="result-block" id="saving-result"></div>
-        <div class="result-block" id="progress-result"></div>
+      <div class="field-group">
+        <label for="progress-planned-saving">월 저축 계획액 (선택)</label>
+        <div class="field-input-wrap">
+          <input type="text" autocomplete="off" inputmode="numeric" id="progress-planned-saving" placeholder="예: 100" />
+          <span class="field-suffix">만원</span>
+        </div>
       </div>
+    </div>
+    <div class="field-group">
+      <label for="goal-spend">원하는 월 생활비 (현재 기준)</label>
+      <div class="field-input-wrap">
+        <input type="text" autocomplete="off" inputmode="numeric" id="goal-spend" placeholder="예: 300" />
+        <span class="field-suffix">만원</span>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-group">
+        <label for="goal-rate">예상 연 수익률</label>
+        <div class="field-input-wrap">
+          <input type="text" autocomplete="off" inputmode="decimal" id="goal-rate" placeholder="예: 7" />
+          <span class="field-suffix">%</span>
+        </div>
+      </div>
+      <div class="field-group">
+        <label for="goal-years">은퇴 시기</label>
+        <div class="field-input-wrap">
+          <input type="text" autocomplete="off" inputmode="numeric" id="goal-years" placeholder="예: 20" />
+          <span class="field-suffix">년 후</span>
+        </div>
+      </div>
+    </div>
+    <div class="field-group">
+      <label for="goal-inflation">저축 증감율 (인플레이션)</label>
+      <div class="field-input-wrap">
+        <input type="text" autocomplete="off" inputmode="decimal" id="goal-inflation" placeholder="예: 3" value="3" />
+        <span class="field-suffix">%</span>
+      </div>
+    </div>
+
+    <div class="result-row">
+      <div class="result-panel" id="goal-result"></div>
+      <div class="result-panel" id="saving-result"></div>
+      <div class="result-panel" id="progress-result"></div>
     </div>
   </section>
 
