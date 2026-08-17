@@ -116,9 +116,8 @@ function simulateDepletion(startAsset, initialMonthlyWithdrawal, annualRatePct, 
 }
 
 /* ---------- 연도별 자산 증감 막대그래프 ---------- */
-function renderGrowthChart(yearly, title) {
+function renderGrowthChart(yearly, title, maxBars = 16) {
   const years = yearly.length - 1;
-  const maxBars = 16;
   const step = Math.max(1, Math.ceil(years / maxBars));
 
   const points = [];
@@ -374,7 +373,7 @@ function recalcDepletion() {
         <div class="result-hero-value negative">약 ${result.years.toFixed(1)}년</div>
         <div class="result-hero-sub">이 시점 이후에도 같은 조건으로 인출을 지속하면 자산이 바닥날 것으로 예상됩니다.</div>
       </div>
-      ${renderGrowthChart(result.yearly, "연도별 예상 자산 잔액")}
+      ${renderGrowthChart(result.yearly, "연도별 예상 자산 잔액", 6)}
     `;
   } else {
     resultEl.innerHTML = `
@@ -383,7 +382,7 @@ function recalcDepletion() {
         <div class="result-hero-value positive">${formatManwon(result.finalBalance)}</div>
         <div class="result-hero-sub">${capYears}년 동안 자산이 소진되지 않을 것으로 예상됩니다.</div>
       </div>
-      ${renderGrowthChart(result.yearly, "연도별 예상 자산 잔액")}
+      ${renderGrowthChart(result.yearly, "연도별 예상 자산 잔액", 6)}
     `;
   }
 }

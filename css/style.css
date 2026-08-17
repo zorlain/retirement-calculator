@@ -236,6 +236,34 @@ header.hero p {
   gap: 10px;
 }
 
+/* 넓은 화면에서 입력(좌)과 결과(우)를 나란히 배치 */
+.card-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 40px;
+  align-items: start;
+}
+
+.card-split-inputs .field-group:last-child {
+  margin-bottom: 0;
+}
+
+.card-split-result {
+  background: var(--card-elevated);
+  border-radius: 16px;
+  padding: 28px 24px;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* 결과 패널 내부 요소는 카드 톤으로 한 단계 낮춰 배경과 겹치지 않게 한다 */
+.card-split-result .result-stat,
+.card-split-result .progress-track {
+  background: var(--card);
+}
+
 .card .card-desc {
   color: var(--text-muted);
   font-size: 15px;
@@ -590,6 +618,14 @@ footer {
 }
 
 /* 모바일 (약 360~430px 기준) */
+/* 입력·결과 2단 배치는 태블릿 이하 폭에서는 답답해지므로 세로 배치로 전환 */
+@media (max-width: 900px) {
+  .card-split {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
 @media (max-width: 640px) {
   .sidebar {
     width: 85vw;

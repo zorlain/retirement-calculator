@@ -34,7 +34,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
-<link rel="stylesheet" href="css/style.css?v=9" />
+<link rel="stylesheet" href="css/style.css?v=10" />
 </head>
 <body>
 <div class="layout">
@@ -64,115 +64,139 @@
 
   <!-- 1단계: 목표 자산 계산 -->
   <section class="card">
-    <h2>
-      🏝️ 목표 자산 계산 (낙원 금액)
-      <button type="button" class="info-btn" aria-label="자세히 보기">
-        <span aria-hidden="true">ⓘ</span>
-        <span class="info-tooltip">
-          <b>실질 인출률</b>: 예상 연 수익률에서 인플레이션을 뺀 값입니다. 은퇴 후 이 비율만큼만
-          인출해서 쓰면 자산의 실질 가치가 잘 줄어들지 않는다고 가정하고, 원하는 생활비를 충당하는 데
-          필요한 자산을 이 비율로 역산합니다.
-        </span>
-      </button>
-    </h2>
-    <p class="card-desc-short">원하는 월 생활비와 은퇴 조건을 입력하면, 낙원을 이루기 위한 목표 자산을 계산합니다.</p>
+    <div class="card-split">
+      <div class="card-split-inputs">
+        <h2>
+          🏝️ 목표 자산 계산 (낙원 금액)
+          <button type="button" class="info-btn" aria-label="자세히 보기">
+            <span aria-hidden="true">ⓘ</span>
+            <span class="info-tooltip">
+              <b>실질 인출률</b>: 예상 연 수익률에서 인플레이션을 뺀 값입니다. 은퇴 후 이 비율만큼만
+              인출해서 쓰면 자산의 실질 가치가 잘 줄어들지 않는다고 가정하고, 원하는 생활비를 충당하는 데
+              필요한 자산을 이 비율로 역산합니다.
+            </span>
+          </button>
+        </h2>
+        <p class="card-desc-short">원하는 월 생활비와 은퇴 조건을 입력하면, 낙원을 이루기 위한 목표 자산을 계산합니다.</p>
 
-    <div class="field-group">
-      <label for="goal-spend">원하는 월 생활비 (현재 기준)</label>
-      <div class="field-input-wrap">
-        <input type="text" autocomplete="off" inputmode="numeric" id="goal-spend" placeholder="예: 300" />
-        <span class="field-suffix">만원</span>
-      </div>
-    </div>
-    <div class="field-row">
-      <div class="field-group">
-        <label for="goal-rate">예상 연 수익률</label>
-        <div class="field-input-wrap">
-          <input type="text" autocomplete="off" inputmode="decimal" id="goal-rate" placeholder="예: 7" />
-          <span class="field-suffix">%</span>
+        <div class="field-group">
+          <label for="goal-spend">원하는 월 생활비 (현재 기준)</label>
+          <div class="field-input-wrap">
+            <input type="text" autocomplete="off" inputmode="numeric" id="goal-spend" placeholder="예: 300" />
+            <span class="field-suffix">만원</span>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label for="goal-rate">예상 연 수익률</label>
+            <div class="field-input-wrap">
+              <input type="text" autocomplete="off" inputmode="decimal" id="goal-rate" placeholder="예: 7" />
+              <span class="field-suffix">%</span>
+            </div>
+          </div>
+          <div class="field-group">
+            <label for="goal-years">은퇴 시기</label>
+            <div class="field-input-wrap">
+              <input type="text" autocomplete="off" inputmode="numeric" id="goal-years" placeholder="예: 20" />
+              <span class="field-suffix">년 후</span>
+            </div>
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="goal-inflation">저축 증감율 (인플레이션)</label>
+          <div class="field-input-wrap">
+            <input type="text" autocomplete="off" inputmode="decimal" id="goal-inflation" placeholder="예: 3" value="3" />
+            <span class="field-suffix">%</span>
+          </div>
         </div>
       </div>
-      <div class="field-group">
-        <label for="goal-years">은퇴 시기</label>
-        <div class="field-input-wrap">
-          <input type="text" autocomplete="off" inputmode="numeric" id="goal-years" placeholder="예: 20" />
-          <span class="field-suffix">년 후</span>
-        </div>
-      </div>
-    </div>
-    <div class="field-group">
-      <label for="goal-inflation">저축 증감율 (인플레이션)</label>
-      <div class="field-input-wrap">
-        <input type="text" autocomplete="off" inputmode="decimal" id="goal-inflation" placeholder="예: 3" value="3" />
-        <span class="field-suffix">%</span>
-      </div>
-    </div>
 
-    <div id="goal-result"></div>
+      <div class="card-split-result">
+        <div id="goal-result"></div>
+      </div>
+    </div>
   </section>
 
   <!-- 2단계: 필요 월 저축액 -->
   <section class="card">
-    <h2>💰 필요 월 저축액</h2>
-    <p class="card-desc-short" id="saving-context">먼저 위에서 목표 자산을 계산합니다.</p>
+    <div class="card-split">
+      <div class="card-split-inputs">
+        <h2>💰 필요 월 저축액</h2>
+        <p class="card-desc-short" id="saving-context">먼저 위에서 목표 자산을 계산합니다.</p>
 
-    <div class="field-group">
-      <label for="saving-current-asset">현재 자산</label>
-      <div class="field-input-wrap">
-        <input type="text" autocomplete="off" inputmode="numeric" id="saving-current-asset" placeholder="예: 5,000" />
-        <span class="field-suffix">만원</span>
+        <div class="field-group">
+          <label for="saving-current-asset">현재 자산</label>
+          <div class="field-input-wrap">
+            <input type="text" autocomplete="off" inputmode="numeric" id="saving-current-asset" placeholder="예: 5,000" />
+            <span class="field-suffix">만원</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-split-result">
+        <div id="saving-result"></div>
       </div>
     </div>
-
-    <div id="saving-result"></div>
   </section>
 
   <!-- 3단계: 목표 달성 진행률 확인 -->
   <section class="card">
-    <h2>📊 목표 달성 진행률 확인</h2>
-    <p class="card-desc-short" id="progress-context">먼저 위 단계를 계산합니다.</p>
+    <div class="card-split">
+      <div class="card-split-inputs">
+        <h2>📊 목표 달성 진행률 확인</h2>
+        <p class="card-desc-short" id="progress-context">먼저 위 단계를 계산합니다.</p>
 
-    <div class="field-group">
-      <label for="progress-planned-saving">실제 월 저축 계획액</label>
-      <div class="field-input-wrap">
-        <input type="text" autocomplete="off" inputmode="numeric" id="progress-planned-saving" placeholder="예: 100" />
-        <span class="field-suffix">만원</span>
+        <div class="field-group">
+          <label for="progress-planned-saving">실제 월 저축 계획액</label>
+          <div class="field-input-wrap">
+            <input type="text" autocomplete="off" inputmode="numeric" id="progress-planned-saving" placeholder="예: 100" />
+            <span class="field-suffix">만원</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-split-result">
+        <div id="progress-result"></div>
       </div>
     </div>
-
-    <div id="progress-result"></div>
   </section>
 
   <!-- 4단계: 은퇴 후 자산 소진 검증 -->
   <section class="card">
-    <h2>
-      📉 은퇴 후 자산 소진 검증
-      <button type="button" class="info-btn" aria-label="자세히 보기">
-        <span aria-hidden="true">ⓘ</span>
-        <span class="info-tooltip">
-          은퇴 시점 자산에서 매달 생활비를 인출하면서, 그 생활비가 매년 인플레이션만큼 늘어난다고
-          가정해 자산이 몇 년 동안 유지되는지 월 단위로 시뮬레이션합니다.
-        </span>
-      </button>
-    </h2>
-    <p class="card-desc-short" id="depletion-context">먼저 위에서 목표 자산을 계산합니다.</p>
+    <div class="card-split">
+      <div class="card-split-inputs">
+        <h2>
+          📉 은퇴 후 자산 소진 검증
+          <button type="button" class="info-btn" aria-label="자세히 보기">
+            <span aria-hidden="true">ⓘ</span>
+            <span class="info-tooltip">
+              은퇴 시점 자산에서 매달 생활비를 인출하면서, 그 생활비가 매년 인플레이션만큼 늘어난다고
+              가정해 자산이 몇 년 동안 유지되는지 월 단위로 시뮬레이션합니다.
+            </span>
+          </button>
+        </h2>
+        <p class="card-desc-short" id="depletion-context">먼저 위에서 목표 자산을 계산합니다.</p>
 
-    <div class="field-group">
-      <label for="depletion-asset">은퇴 시점 자산</label>
-      <div class="field-input-wrap">
-        <input type="text" autocomplete="off" inputmode="numeric" id="depletion-asset" placeholder="예: 50,000" />
-        <span class="field-suffix">만원</span>
+        <div class="field-group">
+          <label for="depletion-asset">은퇴 시점 자산</label>
+          <div class="field-input-wrap">
+            <input type="text" autocomplete="off" inputmode="numeric" id="depletion-asset" placeholder="예: 50,000" />
+            <span class="field-suffix">만원</span>
+          </div>
+        </div>
+        <div class="field-group">
+          <label for="depletion-withdrawal">월 인출액 (생활비)</label>
+          <div class="field-input-wrap">
+            <input type="text" autocomplete="off" inputmode="numeric" id="depletion-withdrawal" placeholder="예: 300" />
+            <span class="field-suffix">만원</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-split-result">
+        <div id="depletion-result"></div>
       </div>
     </div>
-    <div class="field-group">
-      <label for="depletion-withdrawal">월 인출액 (생활비)</label>
-      <div class="field-input-wrap">
-        <input type="text" autocomplete="off" inputmode="numeric" id="depletion-withdrawal" placeholder="예: 300" />
-        <span class="field-suffix">만원</span>
-      </div>
-    </div>
-
-    <div id="depletion-result"></div>
 
     <p class="tip-text" style="margin-top:24px;">
       Tip. 위에서 계산한 목표 자산·수익률·인플레이션이 아래 단계에 자동으로 채워집니다. 값은
