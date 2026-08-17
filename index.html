@@ -80,7 +80,7 @@
     <div class="field-group">
       <label for="goal-spend">원하는 월 생활비 (현재 기준)</label>
       <div class="field-input-wrap">
-        <input type="text" inputmode="numeric" id="goal-spend" placeholder="예: 300" />
+        <input type="text" autocomplete="off" inputmode="numeric" id="goal-spend" placeholder="예: 300" />
         <span class="field-suffix">만원</span>
       </div>
     </div>
@@ -88,14 +88,14 @@
       <div class="field-group">
         <label for="goal-rate">예상 연 수익률</label>
         <div class="field-input-wrap">
-          <input type="text" inputmode="decimal" id="goal-rate" placeholder="예: 7" />
+          <input type="text" autocomplete="off" inputmode="decimal" id="goal-rate" placeholder="예: 7" />
           <span class="field-suffix">%</span>
         </div>
       </div>
       <div class="field-group">
         <label for="goal-years">은퇴 시기</label>
         <div class="field-input-wrap">
-          <input type="text" inputmode="numeric" id="goal-years" placeholder="예: 20" />
+          <input type="text" autocomplete="off" inputmode="numeric" id="goal-years" placeholder="예: 20" />
           <span class="field-suffix">년 후</span>
         </div>
       </div>
@@ -103,12 +103,10 @@
     <div class="field-group">
       <label for="goal-inflation">저축 증감율 (인플레이션)</label>
       <div class="field-input-wrap">
-        <input type="text" inputmode="decimal" id="goal-inflation" placeholder="예: 3" value="3" />
+        <input type="text" autocomplete="off" inputmode="decimal" id="goal-inflation" placeholder="예: 3" value="3" />
         <span class="field-suffix">%</span>
       </div>
     </div>
-
-    <button class="calc-btn" id="goal-calc-btn">🔄 목표 자산 계산하기</button>
 
     <div id="goal-result"></div>
   </section>
@@ -121,12 +119,10 @@
     <div class="field-group">
       <label for="saving-current-asset">현재 자산</label>
       <div class="field-input-wrap">
-        <input type="text" inputmode="numeric" id="saving-current-asset" placeholder="예: 5,000" />
+        <input type="text" autocomplete="off" inputmode="numeric" id="saving-current-asset" placeholder="예: 5,000" />
         <span class="field-suffix">만원</span>
       </div>
     </div>
-
-    <button class="calc-btn" id="saving-calc-btn">🔄 필요 저축액 계산하기</button>
 
     <div id="saving-result"></div>
   </section>
@@ -139,12 +135,10 @@
     <div class="field-group">
       <label for="progress-planned-saving">실제 월 저축 계획액</label>
       <div class="field-input-wrap">
-        <input type="text" inputmode="numeric" id="progress-planned-saving" placeholder="예: 100" />
+        <input type="text" autocomplete="off" inputmode="numeric" id="progress-planned-saving" placeholder="예: 100" />
         <span class="field-suffix">만원</span>
       </div>
     </div>
-
-    <button class="calc-btn" id="progress-calc-btn">🔄 진행률 확인하기</button>
 
     <div id="progress-result"></div>
   </section>
@@ -166,19 +160,17 @@
     <div class="field-group">
       <label for="depletion-asset">은퇴 시점 자산</label>
       <div class="field-input-wrap">
-        <input type="text" inputmode="numeric" id="depletion-asset" placeholder="예: 50,000" />
+        <input type="text" autocomplete="off" inputmode="numeric" id="depletion-asset" placeholder="예: 50,000" />
         <span class="field-suffix">만원</span>
       </div>
     </div>
     <div class="field-group">
       <label for="depletion-withdrawal">월 인출액 (생활비)</label>
       <div class="field-input-wrap">
-        <input type="text" inputmode="numeric" id="depletion-withdrawal" placeholder="예: 300" />
+        <input type="text" autocomplete="off" inputmode="numeric" id="depletion-withdrawal" placeholder="예: 300" />
         <span class="field-suffix">만원</span>
       </div>
     </div>
-
-    <button class="calc-btn" id="depletion-calc-btn">🔄 자산 소진 시뮬레이션하기</button>
 
     <div id="depletion-result"></div>
 
@@ -199,6 +191,6 @@
   </div>
 </div>
 
-<script src="js/app.js?v=6"></script>
+<script src="js/app.js?v=7"></script>
 </body>
 </html>
