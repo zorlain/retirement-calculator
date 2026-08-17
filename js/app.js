@@ -60,20 +60,6 @@ function initThemeToggle() {
   });
 }
 
-/* ---------- 탭 내비게이션 ---------- */
-function initTabs() {
-  const tabs = document.getElementById("tabs");
-  tabs.addEventListener("click", (e) => {
-    const btn = e.target.closest(".tab-btn");
-    if (!btn) return;
-    const target = btn.dataset.tab;
-    tabs.querySelectorAll(".tab-btn").forEach((b) => b.classList.toggle("active", b === btn));
-    document.querySelectorAll("[data-tab-panel]").forEach((panel) => {
-      panel.hidden = panel.dataset.tabPanel !== target;
-    });
-  });
-}
-
 /* ---------- 사이드바 (모바일 드로어) ---------- */
 function initSidebar() {
   const sidebar = document.getElementById("sidebar");
@@ -162,20 +148,49 @@ function renderGrowthChart(yearly, title) {
   `;
 }
 
-/* ---------- 탭 2: 낙원 금액 (경제적 자유) ---------- */
-let paradiseState = null;
+/* ---------- 상태 ---------- */
+let goalState = null; // 1단계 결과: { target, years, rate, inflation, monthlySpend, futureMonthlySpend }
+let savingState = null; // 2단계 결과: { currentAsset, requiredSaving }
 
-function setupParadise() {
-  bindThousandsInput("p-spend");
-  bindThousandsInput("p-current-asset");
-  bindThousandsInput("p-monthly-saving");
+/* 하위 단계의 안내 문구·자동 채움 값을 최신 goalState 기준으로 갱신 */
+function refreshDownstreamFromGoal() {
+  const savingContext = document.getElementById("saving-context");
+  const progressContext = document.getElementById("progress-context");
+  const depletionContext = document.getElementById("depletion-context");
 
-  document.getElementById("paradise-calc-btn").addEventListener("click", () => {
-    const resultEl = document.getElementById("paradise-result");
-    const monthlySpend = toNumber(document.getElementById("p-spend").value);
-    const rate = toNumber(document.getElementById("p-rate").value);
-    const years = Math.round(toNumber(document.getElementById("p-years").value));
-    const inflation = toNumber(document.getElementById("p-inflation").value);
+  document.getElementById("saving-result").innerHTML = "";
+  document.getElementById("progress-result").innerHTML = "";
+  document.getElementById("depletion-result").innerHTML = "";
+  savingState = null;
+
+  if (!goalState) {
+    savingContext.textContent = "먼저 위에서 목표 자산을 계산합니다.";
+    progressContext.textContent = "먼저 위 단계를 계산합니다.";
+    depletionContext.textContent = "먼저 1단계에서 목표 자산을 계산합니다.";
+    return;
+  }
+
+  const summary = `목표 자산 ${formatManwon(goalState.target)} · 수익률 ${goalState.rate}% · 은퇴 시기 ${goalState.years}년 후 기준`;
+  savingContext.textContent = `${summary}으로 계산합니다.`;
+  progressContext.textContent = "먼저 2단계에서 필요 저축액을 계산합니다.";
+
+  const depletionAssetEl = document.getElementById("depletion-asset");
+  const depletionWithdrawalEl = document.getElementById("depletion-withdrawal");
+  depletionAssetEl.value = Math.round(goalState.target).toLocaleString("ko-KR");
+  depletionWithdrawalEl.value = Math.round(goalState.futureMonthlySpend).toLocaleString("ko-KR");
+  depletionContext.textContent = `수익률 ${goalState.rate}% · 인플레이션 ${goalState.inflation}% 기준으로 계산합니다. 값은 직접 바꿀 수 있습니다.`;
+}
+
+/* ---------- 1단계: 목표 자산 계산 ---------- */
+function setupGoal() {
+  bindThousandsInput("goal-spend");
+
+  document.getElementById("goal-calc-btn").addEventListener("click", () => {
+    const resultEl = document.getElementById("goal-result");
+    const monthlySpend = toNumber(document.getElementById("goal-spend").value);
+    const rate = toNumber(document.getElementById("goal-rate").value);
+    const years = Math.round(toNumber(document.getElementById("goal-years").value));
+    const inflation = toNumber(document.getElementById("goal-inflation").value);
 
     if (
       !monthlySpend ||
@@ -186,28 +201,28 @@ function setupParadise() {
       !Number.isFinite(inflation)
     ) {
       resultEl.innerHTML = `<p class="result-placeholder">월 생활비, 예상 연 수익률, 은퇴 시기, 인플레이션을 모두 입력합니다.</p>`;
-      paradiseState = null;
-      document.getElementById("paradise-compare-result").innerHTML = "";
+      goalState = null;
+      refreshDownstreamFromGoal();
       return;
     }
 
     const realWithdrawalRate = rate - inflation;
     if (realWithdrawalRate <= 0) {
       resultEl.innerHTML = `<p class="result-placeholder">예상 연 수익률이 인플레이션보다 높아야 계산할 수 있습니다.</p>`;
-      paradiseState = null;
-      document.getElementById("paradise-compare-result").innerHTML = "";
+      goalState = null;
+      refreshDownstreamFromGoal();
       return;
     }
 
     const futureMonthlySpend = monthlySpend * Math.pow(1 + inflation / 100, years);
-    const paradiseAmount = (futureMonthlySpend * 12) / (realWithdrawalRate / 100);
+    const target = (futureMonthlySpend * 12) / (realWithdrawalRate / 100);
 
-    paradiseState = { paradiseAmount, years, rate, inflation, futureMonthlySpend };
+    goalState = { target, years, rate, inflation, monthlySpend, futureMonthlySpend };
 
     resultEl.innerHTML = `
       <div class="result-hero">
         <div class="result-hero-label">${years}년 후 낙원을 이루기 위한 자산</div>
-        <div class="result-hero-value">${formatManwon(paradiseAmount)}</div>
+        <div class="result-hero-value">${formatManwon(target)}</div>
         <div class="result-hero-sub">실질 인출률 ${realWithdrawalRate.toFixed(1)}% (수익률 ${rate}% − 인플레이션 ${inflation}%) 기준</div>
       </div>
       <div class="result-grid">
@@ -222,31 +237,88 @@ function setupParadise() {
       </div>
     `;
 
-    document.getElementById("paradise-compare-result").innerHTML = "";
+    refreshDownstreamFromGoal();
   });
+}
 
-  document.getElementById("paradise-compare-btn").addEventListener("click", () => {
-    const resultEl = document.getElementById("paradise-compare-result");
-    if (!paradiseState) {
-      resultEl.innerHTML = `<p class="result-placeholder">위에서 낙원 금액을 먼저 계산합니다.</p>`;
+/* ---------- 2단계: 필요 월 저축액 ---------- */
+function setupSaving() {
+  bindThousandsInput("saving-current-asset");
+
+  document.getElementById("saving-calc-btn").addEventListener("click", () => {
+    const resultEl = document.getElementById("saving-result");
+    if (!goalState) {
+      resultEl.innerHTML = `<p class="result-placeholder">먼저 1단계에서 목표 자산을 계산합니다.</p>`;
       return;
     }
 
-    const currentAsset = toNumber(document.getElementById("p-current-asset").value) || 0;
-    const monthlySaving = toNumber(document.getElementById("p-monthly-saving").value) || 0;
+    const currentAsset = toNumber(document.getElementById("saving-current-asset").value) || 0;
+    const monthlyRate = goalState.rate / 100 / 12;
+    const months = goalState.years * 12;
+    const futureValueOfCurrent = currentAsset * Math.pow(1 + monthlyRate, months);
 
-    const { finalBalance } = simulateGrowth(currentAsset, monthlySaving, paradiseState.rate, paradiseState.years);
-    const diff = finalBalance - paradiseState.paradiseAmount;
-    const progressPct = Math.min(100, (finalBalance / paradiseState.paradiseAmount) * 100);
+    document.getElementById("progress-result").innerHTML = "";
+
+    if (futureValueOfCurrent >= goalState.target) {
+      savingState = { currentAsset, requiredSaving: 0 };
+      resultEl.innerHTML = `
+        <div class="result-hero">
+          <div class="result-hero-label">필요 월 저축액</div>
+          <div class="result-hero-value positive">0원</div>
+          <div class="result-hero-sub">현재 자산만으로도 ${goalState.years}년 후 목표(${formatManwon(goalState.target)})에 도달합니다.</div>
+        </div>
+      `;
+      document.getElementById("progress-context").textContent = "2단계 결과를 기준으로 계산합니다.";
+      const plannedEl = document.getElementById("progress-planned-saving");
+      if (!plannedEl.value) plannedEl.value = "0";
+      return;
+    }
+
+    const requiredSaving =
+      monthlyRate === 0
+        ? (goalState.target - futureValueOfCurrent) / months
+        : (goalState.target - futureValueOfCurrent) / ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+
+    savingState = { currentAsset, requiredSaving };
 
     resultEl.innerHTML = `
       <div class="result-hero">
-        <div class="result-hero-label">${paradiseState.years}년 후 예상 자산</div>
+        <div class="result-hero-label">목표 달성을 위한 필요 월 저축액</div>
+        <div class="result-hero-value">${formatManwon(requiredSaving)}</div>
+        <div class="result-hero-sub">${goalState.years}년 후 ${formatManwon(goalState.target)} 목표 기준</div>
+      </div>
+    `;
+
+    document.getElementById("progress-context").textContent = `현재 자산 ${formatManwon(currentAsset)} · ${goalState.years}년 후 ${formatManwon(goalState.target)} 목표 기준으로 계산합니다.`;
+    const plannedEl = document.getElementById("progress-planned-saving");
+    if (!plannedEl.value) plannedEl.value = Math.max(0, Math.round(requiredSaving)).toLocaleString("ko-KR");
+  });
+}
+
+/* ---------- 3단계: 목표 달성 진행률 확인 ---------- */
+function setupProgress() {
+  bindThousandsInput("progress-planned-saving");
+
+  document.getElementById("progress-calc-btn").addEventListener("click", () => {
+    const resultEl = document.getElementById("progress-result");
+    if (!goalState || !savingState) {
+      resultEl.innerHTML = `<p class="result-placeholder">먼저 위 단계를 계산합니다.</p>`;
+      return;
+    }
+
+    const plannedSaving = toNumber(document.getElementById("progress-planned-saving").value) || 0;
+    const { finalBalance } = simulateGrowth(savingState.currentAsset, plannedSaving, goalState.rate, goalState.years);
+    const diff = finalBalance - goalState.target;
+    const progressPct = Math.min(100, (finalBalance / goalState.target) * 100);
+
+    resultEl.innerHTML = `
+      <div class="result-hero">
+        <div class="result-hero-label">${goalState.years}년 후 예상 자산</div>
         <div class="result-hero-value">${formatManwon(finalBalance)}</div>
       </div>
       <div class="result-grid">
         <div class="result-stat">
-          <div class="result-stat-label">낙원 금액과의 차이</div>
+          <div class="result-stat-label">목표 자산과의 차이</div>
           <div class="result-stat-value ${diff >= 0 ? "positive" : "negative"}">${diff >= 0 ? "+" : "-"}${formatManwon(Math.abs(diff))}</div>
         </div>
         <div class="result-stat">
@@ -262,99 +334,33 @@ function setupParadise() {
       <p class="result-hero-sub" style="text-align:center;margin-top:14px;">
         ${
           diff >= 0
-            ? "낙원 금액을 달성할 것으로 예상됩니다."
-            : `낙원 금액에는 ${formatManwon(Math.abs(diff))} 부족할 것으로 예상됩니다.`
+            ? "목표 자산을 달성할 것으로 예상됩니다."
+            : `목표 자산에는 ${formatManwon(Math.abs(diff))} 부족할 것으로 예상됩니다.`
         }
       </p>
     `;
   });
 }
 
-/* ---------- 탭 2: 저축·인출 계획 ---------- */
-function setupPlan() {
-  bindThousandsInput("plan-target");
-  bindThousandsInput("plan-current-asset");
-  bindThousandsInput("plan-retire-asset");
-  bindThousandsInput("plan-withdrawal");
+/* ---------- 4단계: 은퇴 후 자산 소진 검증 ---------- */
+function setupDepletion() {
+  bindThousandsInput("depletion-asset");
+  bindThousandsInput("depletion-withdrawal");
 
-  document.getElementById("tabs").addEventListener("click", (e) => {
-    const btn = e.target.closest(".tab-btn");
-    if (!btn || btn.dataset.tab !== "plan" || !paradiseState) return;
-
-    const targetEl = document.getElementById("plan-target");
-    const rateEl = document.getElementById("plan-rate");
-    const yearsEl = document.getElementById("plan-years");
-    const retireAssetEl = document.getElementById("plan-retire-asset");
-    const withdrawalEl = document.getElementById("plan-withdrawal");
-    const depletionRateEl = document.getElementById("plan-depletion-rate");
-    const depletionInflationEl = document.getElementById("plan-depletion-inflation");
-
-    if (!targetEl.value) targetEl.value = Math.round(paradiseState.paradiseAmount).toLocaleString("ko-KR");
-    if (!rateEl.value) rateEl.value = paradiseState.rate;
-    if (!yearsEl.value) yearsEl.value = paradiseState.years;
-    if (!retireAssetEl.value) retireAssetEl.value = Math.round(paradiseState.paradiseAmount).toLocaleString("ko-KR");
-    if (!withdrawalEl.value) withdrawalEl.value = Math.round(paradiseState.futureMonthlySpend).toLocaleString("ko-KR");
-    if (!depletionRateEl.value) depletionRateEl.value = paradiseState.rate;
-    if (!depletionInflationEl.value) depletionInflationEl.value = paradiseState.inflation;
-  });
-
-  document.getElementById("plan-calc-btn").addEventListener("click", () => {
-    const resultEl = document.getElementById("plan-result");
-    const target = toNumber(document.getElementById("plan-target").value);
-    const current = toNumber(document.getElementById("plan-current-asset").value) || 0;
-    const rate = toNumber(document.getElementById("plan-rate").value);
-    const years = Math.round(toNumber(document.getElementById("plan-years").value));
-
-    if (!target || target <= 0 || !Number.isFinite(rate) || !years || years <= 0) {
-      resultEl.innerHTML = `<p class="result-placeholder">목표 자산, 예상 연 수익률, 목표 기간을 모두 입력합니다.</p>`;
+  document.getElementById("depletion-calc-btn").addEventListener("click", () => {
+    const resultEl = document.getElementById("depletion-result");
+    if (!goalState) {
+      resultEl.innerHTML = `<p class="result-placeholder">먼저 1단계에서 목표 자산을 계산합니다.</p>`;
       return;
     }
 
-    const monthlyRate = rate / 100 / 12;
-    const months = years * 12;
-    const futureValueOfCurrent = current * Math.pow(1 + monthlyRate, months);
+    const retireAsset = toNumber(document.getElementById("depletion-asset").value);
+    const withdrawal = toNumber(document.getElementById("depletion-withdrawal").value);
+    const rate = goalState.rate;
+    const inflation = goalState.inflation;
 
-    if (futureValueOfCurrent >= target) {
-      resultEl.innerHTML = `
-        <div class="result-hero">
-          <div class="result-hero-label">필요 월 저축액</div>
-          <div class="result-hero-value positive">0원</div>
-          <div class="result-hero-sub">현재 자산만으로도 ${years}년 후 목표(${formatManwon(target)})에 도달합니다.</div>
-        </div>
-      `;
-      return;
-    }
-
-    const requiredSaving =
-      monthlyRate === 0
-        ? (target - futureValueOfCurrent) / months
-        : (target - futureValueOfCurrent) / ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
-
-    resultEl.innerHTML = `
-      <div class="result-hero">
-        <div class="result-hero-label">목표 달성을 위한 필요 월 저축액</div>
-        <div class="result-hero-value">${formatManwon(requiredSaving)}</div>
-        <div class="result-hero-sub">${years}년 후 ${formatManwon(target)} 목표 기준</div>
-      </div>
-    `;
-  });
-
-  document.getElementById("plan-depletion-btn").addEventListener("click", () => {
-    const resultEl = document.getElementById("plan-depletion-result");
-    const retireAsset = toNumber(document.getElementById("plan-retire-asset").value);
-    const withdrawal = toNumber(document.getElementById("plan-withdrawal").value);
-    const rate = toNumber(document.getElementById("plan-depletion-rate").value);
-    const inflation = toNumber(document.getElementById("plan-depletion-inflation").value);
-
-    if (
-      !retireAsset ||
-      retireAsset <= 0 ||
-      !withdrawal ||
-      withdrawal <= 0 ||
-      !Number.isFinite(rate) ||
-      !Number.isFinite(inflation)
-    ) {
-      resultEl.innerHTML = `<p class="result-placeholder">은퇴 시점 자산, 월 인출액, 예상 연 수익률, 인플레이션을 모두 입력합니다.</p>`;
+    if (!retireAsset || retireAsset <= 0 || !withdrawal || withdrawal <= 0) {
+      resultEl.innerHTML = `<p class="result-placeholder">은퇴 시점 자산과 월 인출액을 입력합니다.</p>`;
       return;
     }
 
@@ -386,10 +392,11 @@ function setupPlan() {
 function init() {
   initThemeToggle();
   initSidebar();
-  initTabs();
   initInfoTooltips();
-  setupParadise();
-  setupPlan();
+  setupGoal();
+  setupSaving();
+  setupProgress();
+  setupDepletion();
 }
 
 document.addEventListener("DOMContentLoaded", init);

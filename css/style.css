@@ -220,37 +220,6 @@ header.hero p {
 }
 
 
-/* 탭 내비게이션 */
-.tabs {
-  display: flex;
-  gap: 6px;
-  background: var(--accent-soft);
-  border-radius: 9999px;
-  padding: 8px;
-  margin-bottom: 28px;
-  flex-wrap: wrap;
-}
-
-.tab-btn {
-  flex: 1;
-  min-width: 0;
-  border: none;
-  background: transparent;
-  padding: 16px 10px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-muted);
-  border-radius: 9999px;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-  white-space: nowrap;
-}
-
-.tab-btn.active {
-  background: var(--card);
-  color: var(--accent);
-}
-
 .card {
   background: var(--card);
   border-radius: 20px;
@@ -620,19 +589,6 @@ footer {
   line-height: 1.8;
 }
 
-/* 카드 내부 하위 섹션 구분 */
-.subsection-divider {
-  height: 1px;
-  background: var(--border);
-  margin: 32px 0 24px;
-}
-
-.subsection-title {
-  font-size: 16px;
-  font-weight: 600;
-  margin: 0 0 6px;
-}
-
 /* 모바일 (약 360~430px 기준) */
 @media (max-width: 640px) {
   .sidebar {
@@ -684,17 +640,6 @@ footer {
   .card h2 {
     font-size: 17px;
     margin: 0 0 12px;
-  }
-
-  .tabs {
-    padding: 5px;
-    gap: 4px;
-    margin-bottom: 18px;
-  }
-  .tab-btn {
-    font-size: 12.5px;
-    padding: 12px 6px;
-    line-height: 1.3;
   }
 
   .growth-chart-bars {
