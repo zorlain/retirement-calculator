@@ -34,7 +34,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
 <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
-<link rel="stylesheet" href="css/style.css?v=10" />
+<link rel="stylesheet" href="css/style.css?v=12" />
 </head>
 <body>
 <div class="layout">
@@ -62,7 +62,7 @@
     </div>
   </header>
 
-  <!-- 1단계: 목표 자산 계산 -->
+  <!-- 목표 자산 + 필요 저축액 + 진행률 (통합) -->
   <section class="card">
     <div class="card-split">
       <div class="card-split-inputs">
@@ -77,7 +77,7 @@
             </span>
           </button>
         </h2>
-        <p class="card-desc-short">원하는 월 생활비와 은퇴 조건을 입력하면, 낙원을 이루기 위한 목표 자산을 계산합니다.</p>
+        <p class="card-desc-short">원하는 월 생활비와 은퇴 조건을 입력하면, 낙원을 이루기 위한 목표 자산과 필요 월 저축액을 계산합니다.</p>
 
         <div class="field-group">
           <label for="goal-spend">원하는 월 생활비 (현재 기준)</label>
@@ -109,59 +109,33 @@
             <span class="field-suffix">%</span>
           </div>
         </div>
+        <div class="field-row">
+          <div class="field-group">
+            <label for="saving-current-asset">현재 자산</label>
+            <div class="field-input-wrap">
+              <input type="text" autocomplete="off" inputmode="numeric" id="saving-current-asset" placeholder="예: 5,000" />
+              <span class="field-suffix">만원</span>
+            </div>
+          </div>
+          <div class="field-group">
+            <label for="progress-planned-saving">월 저축 계획액 (선택)</label>
+            <div class="field-input-wrap">
+              <input type="text" autocomplete="off" inputmode="numeric" id="progress-planned-saving" placeholder="예: 100" />
+              <span class="field-suffix">만원</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="card-split-result">
         <div id="goal-result"></div>
+        <div class="result-block" id="saving-result"></div>
+        <div class="result-block" id="progress-result"></div>
       </div>
     </div>
   </section>
 
-  <!-- 2단계: 필요 월 저축액 -->
-  <section class="card">
-    <div class="card-split">
-      <div class="card-split-inputs">
-        <h2>💰 필요 월 저축액</h2>
-        <p class="card-desc-short" id="saving-context">먼저 위에서 목표 자산을 계산합니다.</p>
-
-        <div class="field-group">
-          <label for="saving-current-asset">현재 자산</label>
-          <div class="field-input-wrap">
-            <input type="text" autocomplete="off" inputmode="numeric" id="saving-current-asset" placeholder="예: 5,000" />
-            <span class="field-suffix">만원</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="card-split-result">
-        <div id="saving-result"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 3단계: 목표 달성 진행률 확인 -->
-  <section class="card">
-    <div class="card-split">
-      <div class="card-split-inputs">
-        <h2>📊 목표 달성 진행률 확인</h2>
-        <p class="card-desc-short" id="progress-context">먼저 위 단계를 계산합니다.</p>
-
-        <div class="field-group">
-          <label for="progress-planned-saving">실제 월 저축 계획액</label>
-          <div class="field-input-wrap">
-            <input type="text" autocomplete="off" inputmode="numeric" id="progress-planned-saving" placeholder="예: 100" />
-            <span class="field-suffix">만원</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="card-split-result">
-        <div id="progress-result"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 4단계: 은퇴 후 자산 소진 검증 -->
+  <!-- 은퇴 후 자산 소진 검증 -->
   <section class="card">
     <div class="card-split">
       <div class="card-split-inputs">
@@ -215,6 +189,6 @@
   </div>
 </div>
 
-<script src="js/app.js?v=7"></script>
+<script src="js/app.js?v=8"></script>
 </body>
 </html>

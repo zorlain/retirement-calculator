@@ -150,6 +150,7 @@ function renderGrowthChart(yearly, title, maxBars = 16) {
 /* ---------- 상태 ---------- */
 let goalState = null; // 1단계 결과: { target, years, rate, inflation, monthlySpend, futureMonthlySpend }
 let savingState = null; // 2단계 결과: { currentAsset, requiredSaving }
+let progressPlannedTouched = false; // 사용자가 월 저축 계획액을 직접 수정했는지 여부
 
 /* ---------- 1단계: 목표 자산 계산 ---------- */
 function recalcGoal() {
@@ -200,14 +201,11 @@ function recalcGoal() {
   refreshDownstreamFromGoal();
 }
 
-/* 하위 단계의 안내 문구·자동 채움 값을 최신 goalState 기준으로 갱신하고 연쇄 재계산 */
+/* 하위 계산의 자동 채움 값을 최신 goalState 기준으로 갱신하고 연쇄 재계산 */
 function refreshDownstreamFromGoal() {
-  const savingContext = document.getElementById("saving-context");
   const depletionContext = document.getElementById("depletion-context");
 
   if (!goalState) {
-    savingContext.textContent = "먼저 위에서 목표 자산을 계산합니다.";
-    document.getElementById("progress-context").textContent = "먼저 위 단계를 계산합니다.";
     depletionContext.textContent = "먼저 위에서 목표 자산을 계산합니다.";
     document.getElementById("saving-result").innerHTML = "";
     document.getElementById("progress-result").innerHTML = "";
@@ -215,9 +213,6 @@ function refreshDownstreamFromGoal() {
     savingState = null;
     return;
   }
-
-  const summary = `목표 자산 ${formatManwon(goalState.target)} · 수익률 ${goalState.rate}% · 은퇴 시기 ${goalState.years}년 후 기준`;
-  savingContext.textContent = `${summary}으로 계산합니다.`;
 
   const depletionAssetEl = document.getElementById("depletion-asset");
   const depletionWithdrawalEl = document.getElementById("depletion-withdrawal");
@@ -239,12 +234,10 @@ function setupGoal() {
 /* ---------- 2단계: 필요 월 저축액 ---------- */
 function recalcSaving() {
   const resultEl = document.getElementById("saving-result");
-  const progressContext = document.getElementById("progress-context");
 
   if (!goalState) {
-    resultEl.innerHTML = `<p class="result-placeholder">먼저 위에서 목표 자산을 계산합니다.</p>`;
+    resultEl.innerHTML = "";
     savingState = null;
-    progressContext.textContent = "먼저 위 단계를 계산합니다.";
     document.getElementById("progress-result").innerHTML = "";
     return;
   }
@@ -263,9 +256,7 @@ function recalcSaving() {
         <div class="result-hero-sub">현재 자산만으로도 ${goalState.years}년 후 목표(${formatManwon(goalState.target)})에 도달합니다.</div>
       </div>
     `;
-    progressContext.textContent = "위 결과를 기준으로 계산합니다.";
-    const plannedEl = document.getElementById("progress-planned-saving");
-    if (!plannedEl.value) plannedEl.value = "0";
+    if (!progressPlannedTouched) document.getElementById("progress-planned-saving").value = "0";
     recalcProgress();
     return;
   }
@@ -285,9 +276,9 @@ function recalcSaving() {
     </div>
   `;
 
-  progressContext.textContent = `현재 자산 ${formatManwon(currentAsset)} · ${goalState.years}년 후 ${formatManwon(goalState.target)} 목표 기준으로 계산합니다.`;
-  const plannedEl = document.getElementById("progress-planned-saving");
-  if (!plannedEl.value) plannedEl.value = Math.max(0, Math.round(requiredSaving)).toLocaleString("ko-KR");
+  if (!progressPlannedTouched) {
+    document.getElementById("progress-planned-saving").value = Math.max(0, Math.round(requiredSaving)).toLocaleString("ko-KR");
+  }
 
   recalcProgress();
 }
@@ -301,7 +292,7 @@ function setupSaving() {
 function recalcProgress() {
   const resultEl = document.getElementById("progress-result");
   if (!goalState || !savingState) {
-    resultEl.innerHTML = `<p class="result-placeholder">먼저 위 단계를 계산합니다.</p>`;
+    resultEl.innerHTML = "";
     return;
   }
 
@@ -342,7 +333,10 @@ function recalcProgress() {
 
 function setupProgress() {
   bindThousandsInput("progress-planned-saving");
-  document.getElementById("progress-planned-saving").addEventListener("input", recalcProgress);
+  document.getElementById("progress-planned-saving").addEventListener("input", () => {
+    progressPlannedTouched = true;
+    recalcProgress();
+  });
 }
 
 /* ---------- 4단계: 은퇴 후 자산 소진 검증 ---------- */
